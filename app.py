@@ -114,6 +114,36 @@ def add_date():
 
     return render_template('add_date.html')
 
+@app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
+@login_required
+def edit_date(entry_id):
+    entry = DateEntry.query.get_or_404(entry_id)
+
+    if entry.couple_id != current_user.couple_id:
+        return "Not authorized", 403
+
+    if request.method == 'POST':
+        entry.title = request.form['title']
+        entry.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
+        entry.location = request.form['location']
+        entry.notes = request.form['notes']
+        db.session.commit()
+        return redirect(url_for('home_page'))
+
+    return render_template('edit_date.html', entry=entry)
+
+@app.route('/delete/<int:entry_id>', methods=['POST'])
+@login_required
+def delete_date(entry_id):
+    entry = DateEntry.query.get_or_404(entry_id)
+
+    if entry.couple_id != current_user.couple_id:
+        return "Not authorized", 403
+
+    db.session.delete(entry)
+    db.session.commit()
+    return redirect(url_for('home_page'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

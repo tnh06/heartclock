@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Edit Date - Heartclock{% endblock %}
+
+{% block content %}
+    <h1>Edit Date</h1>
+    <form method="POST">
+        <input type="text" name="title" value="{{ entry.title }}" required>
+        <input type="date" name="date" value="{{ entry.date }}" required>
+        <input type="text" name="location" value="{{ entry.location or '' }}">
+        <textarea name="notes">{{ entry.notes or '' }}</textarea>
+        <button type="submit">Save Changes</button>
+    </form>
+    <a href="{{ url_for('home_page') }}">Back to Your Dates</a>
+{% endblock %}
