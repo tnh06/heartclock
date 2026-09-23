@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Sign Up - Heartclock</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Sign Up - Heartclock{% endblock %}
+
+{% block content %}
     <h1>Sign Up</h1>
     <form method="POST">
         <input type="email" name="email" placeholder="Email" required>
@@ -11,5 +9,4 @@
         <input type="text" name="invite_code" placeholder="Invite code (optional, leave blank if you're the first)">
         <button type="submit">Sign Up</button>
     </form>
-</body>
-</html>
+{% endblock %}

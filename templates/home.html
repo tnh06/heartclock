@@ -1,9 +1,7 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Heartclock</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Your Dates - Heartclock{% endblock %}
+
+{% block content %}
     <h1>Your Dates</h1>
     <a href="{{ url_for('logout') }}">Log out</a>
     <a href="{{ url_for('add_date') }}">Add a date</a>
@@ -21,5 +19,4 @@
     {% else %}
         <p>No dates logged yet.</p>
     {% endif %}
-</body>
-</html>
+{% endblock %}
