@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, Couple
+from models import db, User, Couple, DateEntry
 import secrets
 
 app = Flask(__name__)
@@ -22,6 +22,12 @@ def load_user(user_id):
 @app.route('/')
 def home():
     return "Heartclock is alive"
+
+@app.route('/home')
+@login_required
+def home_page():
+    entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
+    return render_template('home.html', entries=entries)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -52,9 +58,11 @@ def signup():
         login_user(new_user)
 
         if invite_code:
-            return "Signed up and joined your partner's couple!"
+            print(f"{email} joined couple {couple.id}")
         else:
-            return f"Signed up! Your invite code is {couple.invite_code}, send it to your partner."
+            print(f"{email} created couple with invite code: {couple.invite_code}")
+
+        return redirect(url_for('home_page'))
 
     return render_template('signup.html')
 
@@ -68,7 +76,7 @@ def login():
 
         if user and bcrypt.check_password_hash(user.password_hash, password):
             login_user(user)
-            return "Logged in successfully"
+            return redirect(url_for('home_page'))
         else:
             return "Invalid email or password"
 
