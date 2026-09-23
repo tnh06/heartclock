@@ -6,6 +6,7 @@
 <body>
     <h1>Your Dates</h1>
     <a href="{{ url_for('logout') }}">Log out</a>
+    <a href="{{ url_for('add_date') }}">Add a date</a>
 
     {% if entries %}
         <ul>

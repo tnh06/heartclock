@@ -3,6 +3,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry
 import secrets
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heartclock.db'
@@ -87,6 +88,31 @@ def login():
 def logout():
     logout_user()
     return "Logged out"
+
+@app.route('/add', methods=['GET', 'POST'])
+@login_required
+def add_date():
+    if request.method == 'POST':
+        title = request.form['title']
+        date_str = request.form['date']
+        location = request.form['location']
+        notes = request.form['notes']
+
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+
+        new_entry = DateEntry(
+            couple_id=current_user.couple_id,
+            title=title,
+            date=date_obj,
+            location=location,
+            notes=notes
+        )
+        db.session.add(new_entry)
+        db.session.commit()
+
+        return redirect(url_for('home_page'))
+
+    return render_template('add_date.html')
 
 if __name__ == '__main__':
     with app.app_context():

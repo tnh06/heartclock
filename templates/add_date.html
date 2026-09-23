@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Date - Heartclock</title>
+</head>
+<body>
+    <h1>Add a Date</h1>
+    <form method="POST">
+        <input type="text" name="title" placeholder="Title" required><br>
+        <input type="date" name="date" required><br>
+        <input type="text" name="location" placeholder="Location"><br>
+        <textarea name="notes" placeholder="Notes"></textarea><br>
+        <button type="submit">Save Date</button>
+    </form>
+    <a href="{{ url_for('home_page') }}">Back to Your Dates</a>
+</body>
+</html>
