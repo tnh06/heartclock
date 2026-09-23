@@ -28,6 +28,7 @@ def signup():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
+        invite_code = request.form.get('invite_code', '').strip()
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -35,16 +36,25 @@ def signup():
 
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
-        new_couple = Couple(invite_code=secrets.token_hex(4))
-        db.session.add(new_couple)
-        db.session.commit()
+        if invite_code:
+            couple = Couple.query.filter_by(invite_code=invite_code).first()
+            if not couple:
+                return "Invalid invite code"
+        else:
+            couple = Couple(invite_code=secrets.token_hex(4))
+            db.session.add(couple)
+            db.session.commit()
 
-        new_user = User(email=email, password_hash=password_hash, couple_id=new_couple.id)
+        new_user = User(email=email, password_hash=password_hash, couple_id=couple.id)
         db.session.add(new_user)
         db.session.commit()
 
         login_user(new_user)
-        return f"Signed up! Your invite code is {new_couple.invite_code}"
+
+        if invite_code:
+            return "Signed up and joined your partner's couple!"
+        else:
+            return f"Signed up! Your invite code is {couple.invite_code}, send it to your partner."
 
     return render_template('signup.html')
 
