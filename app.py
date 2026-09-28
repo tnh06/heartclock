@@ -29,7 +29,10 @@ def home():
 def home_page():
     entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
     active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
-    return render_template('home.html', entries=entries, active_session=active_session)
+    couple = Couple.query.get(current_user.couple_id)
+    member_count = User.query.filter_by(couple_id=current_user.couple_id).count()
+    return render_template('home.html', entries=entries, active_session=active_session,
+                           couple=couple, member_count=member_count)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -48,6 +51,8 @@ def signup():
             couple = Couple.query.filter_by(invite_code=invite_code).first()
             if not couple:
                 return "Invalid invite code"
+            if User.query.filter_by(couple_id=couple.id).count() >= 2:
+                return "This couple already has two members"
         else:
             couple = Couple(invite_code=secrets.token_hex(4))
             db.session.add(couple)

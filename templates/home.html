@@ -3,6 +3,14 @@
 
 {% block content %}
     <h1>Your Dates</h1>
+
+    {% if member_count < 2 %}
+        <article>
+            <p>Your partner hasn't joined yet. Send them this invite code to enter at signup:</p>
+            <strong>{{ couple.invite_code }}</strong>
+        </article>
+    {% endif %}
+
     <a href="{{ url_for('logout') }}">Log out</a>
     <a href="{{ url_for('add_date') }}">Add a date</a>
 
@@ -21,40 +29,40 @@
 
     {% if entries %}
         <ul>
-        {% for entry in entries %}
-            <li>
-                <strong>{{ entry.title }}</strong> - {{ entry.date }}
-                {% if entry.duration_minutes %}
-                    ({{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m)
-                {% endif %}<br>
-                {{ entry.location or '' }}<br>
-                {{ entry.notes or '' }}<br>
-                <a href="{{ url_for('edit_date', entry_id=entry.id) }}">Edit</a>
-                <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}" style="display:inline">
-                    <button type="submit" onclick="return confirm('Delete this date?')">Delete</button>
-                </form>
-            </li>
-        {% endfor %}
+            {% for entry in entries %}
+                <li>
+                    <strong>{{ entry.title }}</strong> - {{ entry.date }}
+                    {% if entry.duration_minutes %}
+                        ({{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m)
+                    {% endif %}<br>
+                    {{ entry.location or '' }}<br>
+                    {{ entry.notes or '' }}<br>
+                    <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline" style="width:auto; display:inline-block">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}" style="display:inline">
+                        <button type="submit" class="secondary" style="width:auto" onclick="return confirm('Delete this date?')">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
         </ul>
     {% else %}
         <p>No dates logged yet.</p>
     {% endif %}
 
     {% if active_session %}
-    <script>
-        const timerEl = document.getElementById('timer');
-        const start = new Date(timerEl.dataset.start);
+        <script>
+            const timerEl = document.getElementById('timer');
+            const start = new Date(timerEl.dataset.start);
 
-        function updateTimer() {
-            const diff = Math.floor((new Date() - start) / 1000);
-            const h = Math.floor(diff / 3600);
-            const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-            const s = String(diff % 60).padStart(2, '0');
-            timerEl.textContent = `${h}:${m}:${s}`;
-        }
+            function updateTimer() {
+                const diff = Math.floor((new Date() - start) / 1000);
+                const h = Math.floor(diff / 3600);
+                const m = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
+                const s = String(diff % 60).padStart(2, '0');
+                timerEl.textContent = `${h}:${m}:${s}`;
+            }
 
-        updateTimer();
-        setInterval(updateTimer, 1000);
-    </script>
+            updateTimer();
+            setInterval(updateTimer, 1000);
+        </script>
     {% endif %}
 {% endblock %}
