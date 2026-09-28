@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, Couple, DateEntry
+from models import db, User, Couple, DateEntry, ActiveSession
 import secrets
 from datetime import datetime
 
@@ -28,7 +28,8 @@ def home():
 @login_required
 def home_page():
     entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
-    return render_template('home.html', entries=entries)
+    active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
+    return render_template('home.html', entries=entries, active_session=active_session)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -143,6 +144,38 @@ def delete_date(entry_id):
     db.session.delete(entry)
     db.session.commit()
     return redirect(url_for('home_page'))
+
+@app.route('/clock-in', methods=['POST'])
+@login_required
+def clock_in():
+    existing = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
+    if not existing:
+        session = ActiveSession(couple_id=current_user.couple_id)
+        db.session.add(session)
+        db.session.commit()
+    return redirect(url_for('home_page'))
+
+@app.route('/clock-out', methods=['POST'])
+@login_required
+def clock_out():
+    active = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
+    if not active:
+        return redirect(url_for('home_page'))
+
+    elapsed = datetime.utcnow() - active.started_at
+    minutes = max(1, round(elapsed.total_seconds() / 60))
+
+    new_entry = DateEntry(
+        couple_id=current_user.couple_id,
+        title='Untitled date',
+        date=datetime.now().date(),
+        duration_minutes=minutes
+    )
+    db.session.add(new_entry)
+    db.session.delete(active)
+    db.session.commit()
+
+    return redirect(url_for('edit_date', entry_id=new_entry.id))
 
 if __name__ == '__main__':
     with app.app_context():
