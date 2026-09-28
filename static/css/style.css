@@ -1,0 +1,229 @@
+:root[data-theme="dark"] {
+    --pico-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --pico-background-color: #120e18;
+    --pico-color: #e9e4ef;
+    --pico-muted-color: #9a91a8;
+    --pico-primary: #ff7a8f;
+    --pico-primary-background: #e5506b;
+    --pico-primary-hover: #ff9aa9;
+    --pico-primary-hover-background: #ff6b83;
+    --pico-primary-underline: rgba(255, 122, 143, 0.5);
+    --pico-primary-focus: rgba(255, 122, 143, 0.3);
+    --pico-primary-inverse: #ffffff;
+    --pico-card-background-color: #1b1524;
+    --pico-card-border-color: #2b2336;
+    --pico-card-box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+    --pico-border-radius: 0.9rem;
+    --pico-form-element-background-color: #150f1d;
+    --pico-form-element-border-color: #33293f;
+    --pico-form-element-focus-color: #ff7a8f;
+}
+
+body {
+    background:
+        radial-gradient(1200px 500px at 50% -10%, rgba(229, 80, 107, 0.14), transparent 60%),
+        var(--pico-background-color);
+    background-attachment: fixed;
+}
+
+h1, h2, h3 {
+    font-family: 'Fraunces', Georgia, serif;
+}
+
+.page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+}
+
+/* Header */
+.site-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 0 1rem;
+}
+
+.brand {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.5rem;
+    color: var(--pico-primary);
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 1.25rem;
+}
+
+.nav-links a {
+    color: var(--pico-muted-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-links a:hover {
+    color: var(--pico-color);
+}
+
+/* Shared bits */
+.muted {
+    color: var(--pico-muted-color);
+}
+
+.small {
+    width: auto;
+    margin: 0;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
+}
+
+.auth-card {
+    max-width: 440px;
+    margin: 2rem auto;
+}
+
+.auth-card h1 {
+    margin-bottom: 0.25rem;
+}
+
+/* Clock card */
+.clock-card {
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(229, 80, 107, 0.18), rgba(120, 70, 200, 0.14));
+    border: 1px solid rgba(255, 122, 143, 0.25);
+}
+
+.clock-label {
+    margin: 0 0 0.5rem;
+    color: var(--pico-muted-color);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.timer {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 3.5rem;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+    margin-bottom: 1.25rem;
+}
+
+.clock-card form {
+    margin: 0;
+}
+
+.clock-card button {
+    display: block;
+    max-width: 260px;
+    margin: 0 auto;
+}
+
+.beat {
+    display: inline-block;
+    color: var(--pico-primary);
+    animation: beat 1.2s ease-in-out infinite;
+}
+
+@keyframes beat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .beat { animation: none; }
+}
+
+/* Invite banner */
+.invite-banner {
+    border-left: 4px solid var(--pico-primary);
+}
+
+.invite-banner p {
+    margin-bottom: 0.5rem;
+}
+
+.invite-code {
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--pico-primary);
+    background: transparent;
+    padding: 0;
+}
+
+/* Timeline */
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0 1rem;
+}
+
+.section-head h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.date-card {
+    margin: 0 0 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.date-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.date-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.meta {
+    margin: 0.25rem 0 0;
+    color: var(--pico-muted-color);
+    font-size: 0.9rem;
+}
+
+.notes {
+    margin: 0.9rem 0 0;
+    white-space: pre-line;
+}
+
+.pill {
+    background: rgba(255, 122, 143, 0.15);
+    color: var(--pico-primary);
+    padding: 0.15rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.actions form {
+    margin: 0;
+}
+
+.empty {
+    text-align: center;
+    padding: 2.5rem 1rem;
+    color: var(--pico-muted-color);
+}
+
+@media (max-width: 480px) {
+    .timer { font-size: 2.75rem; }
+}
+
+.site-header.centered {
+    justify-content: center;
+}

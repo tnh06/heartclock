@@ -40,6 +40,7 @@ def signup():
         email = request.form['email']
         password = request.form['password']
         invite_code = request.form.get('invite_code', '').strip()
+        display_name = request.form['display_name'].strip()
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
@@ -58,7 +59,7 @@ def signup():
             db.session.add(couple)
             db.session.commit()
 
-        new_user = User(email=email, password_hash=password_hash, couple_id=couple.id)
+        new_user = User(email=email, display_name=display_name, password_hash=password_hash, couple_id=couple.id)
         db.session.add(new_user)
         db.session.commit()
 
@@ -108,6 +109,7 @@ def add_date():
 
         new_entry = DateEntry(
             couple_id=current_user.couple_id,
+            author_id=current_user.id,
             title=title,
             date=date_obj,
             location=location,
@@ -172,6 +174,7 @@ def clock_out():
 
     new_entry = DateEntry(
         couple_id=current_user.couple_id,
+        author_id = current_user.id,
         title='Untitled date',
         date=datetime.now().date(),
         duration_minutes=minutes

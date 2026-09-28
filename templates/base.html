@@ -1,12 +1,41 @@
 <!DOCTYPE html>
-<html data-theme="dark">
+<html data-theme="dark" lang="en">
+
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Heartclock{% endblock %}</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
+
 <body>
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
+    <div class="page">
+        <header class="site-header {% block header_class %}{% endblock %}">
+            <a class="brand" href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">
+                Heartclock</a>
+            {% block nav %}
+            <nav class="nav-links">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('logout') }}">Log out</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">Log in</a>
+                <a href="{{ url_for('signup') }}">Sign up</a>
+                {% endif %}
+            </nav>
+            {% endblock %}
+        </header>
+        <main>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
 </body>
+
 </html>

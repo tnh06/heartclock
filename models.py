@@ -11,12 +11,15 @@ class Couple(db.Model):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    display_name = db.Column(db.String(50), nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
     couple_id = db.Column(db.Integer, db.ForeignKey('couple.id'), nullable=True)
 
 class DateEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     couple_id = db.Column(db.Integer, db.ForeignKey('couple.id'), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    author = db.relationship('User', foreign_keys=[author_id])
     title = db.Column(db.String(200))
     date = db.Column(db.Date)
     location = db.Column(db.String(200))

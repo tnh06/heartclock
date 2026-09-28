@@ -2,50 +2,62 @@
 {% block title %}Your Dates - Heartclock{% endblock %}
 
 {% block content %}
-    <h1>Your Dates</h1>
-
     {% if member_count < 2 %}
-        <article>
+        <article class="invite-banner">
             <p>Your partner hasn't joined yet. Send them this invite code to enter at signup:</p>
-            <strong>{{ couple.invite_code }}</strong>
+            <code class="invite-code">{{ couple.invite_code }}</code>
         </article>
     {% endif %}
 
-    <a href="{{ url_for('logout') }}">Log out</a>
-    <a href="{{ url_for('add_date') }}">Add a date</a>
-
-    <article>
+    <article class="clock-card">
         {% if active_session %}
-            <p>Date in progress: <strong id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</strong></p>
+            <p class="clock-label"><span class="beat">♥</span> Date in progress</p>
+            <div class="timer" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</div>
             <form method="POST" action="{{ url_for('clock_out') }}">
                 <button type="submit">Clock Out</button>
             </form>
         {% else %}
+            <p class="clock-label">Together right now?</p>
             <form method="POST" action="{{ url_for('clock_in') }}">
                 <button type="submit">Clock In</button>
             </form>
         {% endif %}
     </article>
 
+    <div class="section-head">
+        <h2>Your dates</h2>
+        <a href="{{ url_for('add_date') }}" role="button" class="small">+ Add a date</a>
+    </div>
+
     {% if entries %}
-        <ul>
-            {% for entry in entries %}
-                <li>
-                    <strong>{{ entry.title }}</strong> - {{ entry.date }}
+        {% for entry in entries %}
+            <article class="date-card">
+                <div class="date-card-top">
+                    <h3>{{ entry.title }}</h3>
                     {% if entry.duration_minutes %}
-                        ({{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m)
-                    {% endif %}<br>
-                    {{ entry.location or '' }}<br>
-                    {{ entry.notes or '' }}<br>
-                    <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline" style="width:auto; display:inline-block">Edit</a>
-                    <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}" style="display:inline">
-                        <button type="submit" class="secondary" style="width:auto" onclick="return confirm('Delete this date?')">Delete</button>
+                        <span class="pill">
+                            {% if entry.duration_minutes >= 60 %}{{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m{% else %}{{ entry.duration_minutes }}m{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+                <p class="meta">
+                    {{ entry.date.strftime('%a %d %b %Y') }}{% if entry.location %} &middot; {{ entry.location }}{% endif %}{% if entry.author %} &middot; Added by {{ entry.author.display_name }}{% endif %}
+                </p>
+                {% if entry.notes %}
+                    <p class="notes">{{ entry.notes }}</p>
+                {% endif %}
+                <div class="actions">
+                    <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline small">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}">
+                        <button type="submit" class="outline secondary small" onclick="return confirm('Delete this date?')">Delete</button>
                     </form>
-                </li>
-            {% endfor %}
-        </ul>
+                </div>
+            </article>
+        {% endfor %}
     {% else %}
-        <p>No dates logged yet.</p>
+        <div class="empty">
+            <p>No dates logged yet. Clock in on your next one, or add a past date to start the timeline.</p>
+        </div>
     {% endif %}
 
     {% if active_session %}

@@ -1,11 +1,17 @@
 {% extends "base.html" %}
 {% block title %}Log In - Heartclock{% endblock %}
+{% block header_class %}centered{% endblock %}
+{% block nav %}{% endblock %}
 
 {% block content %}
-    <h1>Log In</h1>
-    <form method="POST">
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Log In</button>
-    </form>
+    <article class="auth-card">
+        <h1>Welcome back</h1>
+        <p class="muted">Log in to see your dates.</p>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Log In</button>
+        </form>
+        <p class="muted">New here? <a href="{{ url_for('signup') }}">Sign up</a></p>
+    </article>
 {% endblock %}
