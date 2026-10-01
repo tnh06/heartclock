@@ -271,3 +271,16 @@ h1, h2, h3 {
     border-radius: var(--pico-border-radius);
     margin-bottom: 0.75rem;
 }
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.form-actions button,
+.form-actions a[role="button"] {
+    flex: 1;
+    margin: 0;
+    text-align: center;
+}

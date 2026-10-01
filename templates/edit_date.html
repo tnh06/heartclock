@@ -1,21 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Edit Date - Heartclock{% endblock %}
+{% block title %}Heartclock - Edit Date{% endblock %}
 
 {% block content %}
-    <article class="auth-card">
-        <h1>Edit date</h1>
-        <form method="POST">
-            <label>Title
-                <input type="text" name="title" value="{{ entry.title }}" required>
-            </label>
-            <label>Date
-                <input type="date" name="date" value="{{ entry.date }}" required>
-            </label>
-            <label>Notes
-                <textarea name="notes" rows="4">{{ entry.notes or '' }}</textarea>
-            </label>
+<article class="auth-card">
+    <h1>Edit date</h1>
+    <form method="POST">
+        <label>Title
+            <input type="text" name="title" value="{{ entry.title }}" required>
+        </label>
+        <label>Date
+            <input type="date" name="date" value="{{ entry.date }}" required>
+        </label>
+        <label>Notes
+            <textarea name="notes" rows="4">{{ entry.notes or '' }}</textarea>
+        </label>
+        <div class="form-actions">
             <button type="submit">Save Changes</button>
-        </form>
-        <a href="{{ url_for('archive') }}">Back to your dates</a>
-    </article>
+            <a href="{{ url_for('archive') }}" role="button" class="outline secondary">Cancel</a>
+        </div>
+    </form>
+</article>
 {% endblock %}

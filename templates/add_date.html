@@ -1,21 +1,23 @@
 {% extends "base.html" %}
-{% block title %}Heartclock - Add Date{% endblock %}
+{% block title %}Heartclock • Add Date{% endblock %}
 
 {% block content %}
-    <article class="auth-card">
-        <h1>Add a date</h1>
-        <form method="POST" autocomplete="off">
-            <label>Title
-                <input type="text" name="title" autocomplete="off" required>
-            </label>
-            <label>Date
-                <input type="date" name="date" required>
-            </label>
-            <label>Notes
-                <textarea name="notes" rows="4"></textarea>
-            </label>
+<article class="auth-card">
+    <h1>Add a date</h1>
+    <form method="POST" autocomplete="off">
+        <label>Title
+            <input type="text" name="title" autocomplete="off" required>
+        </label>
+        <label>Date
+            <input type="date" name="date" required>
+        </label>
+        <label>Notes
+            <textarea name="notes" rows="4"></textarea>
+        </label>
+        <div class="form-actions">
             <button type="submit">Save Date</button>
-        </form>
-        <a href="{{ url_for('archive') }}">Back to your dates</a>
-    </article>
+            <a href="{{ url_for('archive') }}" role="button" class="outline secondary">Cancel</a>
+        </div>
+    </form>
+</article>
 {% endblock %}

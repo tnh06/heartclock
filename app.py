@@ -180,20 +180,36 @@ def clock_out():
     elapsed = ended_at - active.started_at
     minutes = max(1, round(elapsed.total_seconds() / 60))
 
-    new_entry = DateEntry(
-        couple_id=current_user.couple_id,
-        author_id=current_user.id,
-        title='Untitled date',
-        date=datetime.now().date(),
-        duration_minutes=minutes,
-        started_at=active.started_at,
-        ended_at=ended_at
-    )
-    db.session.add(new_entry)
     db.session.delete(active)
     db.session.commit()
 
-    return redirect(url_for('edit_date', entry_id=new_entry.id))
+    return redirect(url_for('log_date',
+                             started_at=active.started_at.isoformat(),
+                             ended_at=ended_at.isoformat(),
+                             minutes=minutes))
+
+@app.route('/log-date', methods=['GET', 'POST'])
+@login_required
+def log_date():
+    if request.method == 'POST':
+        new_entry = DateEntry(
+            couple_id=current_user.couple_id,
+            author_id=current_user.id,
+            title=request.form['title'],
+            date=datetime.now().date(),
+            notes=request.form['notes'],
+            duration_minutes=int(request.form['minutes']),
+            started_at=datetime.fromisoformat(request.form['started_at']),
+            ended_at=datetime.fromisoformat(request.form['ended_at'])
+        )
+        db.session.add(new_entry)
+        db.session.commit()
+        return redirect(url_for('archive'))
+
+    return render_template('log_date.html',
+                           started_at=request.args.get('started_at'),
+                           ended_at=request.args.get('ended_at'),
+                           minutes=request.args.get('minutes'))
 
 if __name__ == '__main__':
     with app.app_context():
