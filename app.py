@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry, ActiveSession
@@ -22,7 +22,9 @@ def load_user(user_id):
 
 @app.route('/')
 def home():
-    return "Heartclock is alive"
+    if current_user.is_authenticated:
+        return redirect(url_for('home_page'))
+    return render_template('landing.html')
 
 @app.route('/home')
 @login_required
@@ -44,16 +46,17 @@ def signup():
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            return "Email already registered"
+            flash("That email already registered.")
+            return redirect(url_for('signup'))
 
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
         if invite_code:
             couple = Couple.query.filter_by(invite_code=invite_code).first()
             if not couple:
-                return "Invalid invite code"
+                flash("That invite code doesn't match any account.")
             if User.query.filter_by(couple_id=couple.id).count() >= 2:
-                return "This couple already has two members"
+                flash("That couple already has two members")
         else:
             couple = Couple(invite_code=secrets.token_hex(4))
             db.session.add(couple)
@@ -86,7 +89,8 @@ def login():
             login_user(user)
             return redirect(url_for('home_page'))
         else:
-            return "Invalid email or password"
+            flash("Invalid email or password.")
+            return redirect(url_for('login'))
 
     return render_template('login.html')
 
@@ -94,7 +98,7 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return "Logged out"
+    return redirect(url_for('login'))
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required

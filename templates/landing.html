@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Heartclock{% endblock %}
+{% block header_class %}centered{% endblock %}
+{% block nav %}{% endblock %}
+
+{% block content %}
+    <article class="auth-card" style="text-align:center">
+        <h1>Every date, remembered.</h1>
+        <p class="muted">Heartclock keeps a shared timeline of every date you and your partner have been on, plus a live timer for the one you're on right now.</p>
+        <a href="{{ url_for('signup') }}" role="button" style="display:block; margin-top:1.5rem">Get Started</a>
+        <p class="muted" style="margin-top:1rem">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+    </article>
+{% endblock %}

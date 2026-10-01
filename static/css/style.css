@@ -227,3 +227,20 @@ h1, h2, h3 {
 .site-header.centered {
     justify-content: center;
 }
+
+.flashes {
+    list-style: none;
+    max-width: 440px;
+    margin: 1.5rem auto 0;
+    padding: 0;
+}
+
+.flashes li {
+    list-style: none;
+    background: rgba(255, 122, 143, 0.12);
+    border: 1px solid rgba(255, 122, 143, 0.35);
+    color: var(--pico-primary);
+    padding: 0.75rem 1rem;
+    border-radius: var(--pico-border-radius);
+    margin-bottom: 0.75rem;
+}
