@@ -3,11 +3,12 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry, ActiveSession
 import secrets
+import os
 from datetime import datetime
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heartclock.db'
-app.config['SECRET_KEY'] = 'dev-secret-change-later'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-later')
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
@@ -29,12 +30,17 @@ def home():
 @app.route('/home')
 @login_required
 def home_page():
-    entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
     active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     couple = Couple.query.get(current_user.couple_id)
     member_count = User.query.filter_by(couple_id=current_user.couple_id).count()
-    return render_template('home.html', entries=entries, active_session=active_session,
+    return render_template('home.html', active_session=active_session,
                            couple=couple, member_count=member_count)
+
+@app.route('/archive')
+@login_required
+def archive():
+    entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
+    return render_template('archive.html', entries=entries)
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
@@ -106,7 +112,6 @@ def add_date():
     if request.method == 'POST':
         title = request.form['title']
         date_str = request.form['date']
-        location = request.form['location']
         notes = request.form['notes']
 
         date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
@@ -116,7 +121,6 @@ def add_date():
             author_id=current_user.id,
             title=title,
             date=date_obj,
-            location=location,
             notes=notes
         )
         db.session.add(new_entry)
@@ -137,7 +141,6 @@ def edit_date(entry_id):
     if request.method == 'POST':
         entry.title = request.form['title']
         entry.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
-        entry.location = request.form['location']
         entry.notes = request.form['notes']
         db.session.commit()
         return redirect(url_for('home_page'))
@@ -173,15 +176,18 @@ def clock_out():
     if not active:
         return redirect(url_for('home_page'))
 
-    elapsed = datetime.utcnow() - active.started_at
+    ended_at = datetime.utcnow()
+    elapsed = ended_at - active.started_at
     minutes = max(1, round(elapsed.total_seconds() / 60))
 
     new_entry = DateEntry(
         couple_id=current_user.couple_id,
-        author_id = current_user.id,
+        author_id=current_user.id,
         title='Untitled date',
         date=datetime.now().date(),
-        duration_minutes=minutes
+        duration_minutes=minutes,
+        started_at=active.started_at,
+        ended_at=ended_at
     )
     db.session.add(new_entry)
     db.session.delete(active)

@@ -22,10 +22,11 @@ class DateEntry(db.Model):
     author = db.relationship('User', foreign_keys=[author_id])
     title = db.Column(db.String(200))
     date = db.Column(db.Date)
-    location = db.Column(db.String(200))
     notes = db.Column(db.Text)
     photo_path = db.Column(db.String(300), nullable=True)
     duration_minutes = db.Column(db.Integer, nullable=True)
+    started_at = db.Column(db.DateTime, nullable=True)
+    ended_at = db.Column(db.DateTime, nullable=True)
 
 class ActiveSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)

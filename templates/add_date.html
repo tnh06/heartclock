@@ -11,14 +11,11 @@
             <label>Date
                 <input type="date" name="date" required>
             </label>
-            <label>Location
-                <input type="text" name="location" autocomplete="off">
-            </label>
             <label>Notes
                 <textarea name="notes" rows="4"></textarea>
             </label>
             <button type="submit">Save Date</button>
         </form>
-        <a href="{{ url_for('home_page') }}">Back to your dates</a>
+        <a href="{{ url_for('archive') }}">Back to your dates</a>
     </article>
 {% endblock %}

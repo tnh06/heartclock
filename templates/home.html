@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Your Dates - Heartclock{% endblock %}
+{% block title %}Heartclock{% endblock %}
 
 {% block content %}
     {% if member_count < 2 %}
@@ -23,42 +23,6 @@
             </form>
         {% endif %}
     </article>
-
-    <div class="section-head">
-        <h2>Your dates</h2>
-        <a href="{{ url_for('add_date') }}" role="button" class="small">+ Add a date</a>
-    </div>
-
-    {% if entries %}
-        {% for entry in entries %}
-            <article class="date-card">
-                <div class="date-card-top">
-                    <h3>{{ entry.title }}</h3>
-                    {% if entry.duration_minutes %}
-                        <span class="pill">
-                            {% if entry.duration_minutes >= 60 %}{{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m{% else %}{{ entry.duration_minutes }}m{% endif %}
-                        </span>
-                    {% endif %}
-                </div>
-                <p class="meta">
-                    {{ entry.date.strftime('%a %d %b %Y') }}{% if entry.location %} &middot; {{ entry.location }}{% endif %}{% if entry.author %} &middot; Added by {{ entry.author.display_name }}{% endif %}
-                </p>
-                {% if entry.notes %}
-                    <p class="notes">{{ entry.notes }}</p>
-                {% endif %}
-                <div class="actions">
-                    <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline small">Edit</a>
-                    <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}">
-                        <button type="submit" class="outline secondary small" onclick="return confirm('Delete this date?')">Delete</button>
-                    </form>
-                </div>
-            </article>
-        {% endfor %}
-    {% else %}
-        <div class="empty">
-            <p>No dates logged yet. Clock in on your next one, or add a past date to start the timeline.</p>
-        </div>
-    {% endif %}
 
     {% if active_session %}
         <script>

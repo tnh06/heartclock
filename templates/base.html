@@ -22,14 +22,15 @@
             <a class="brand" href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">
                 Heartclock</a>
             {% block nav %}
-            <nav class="nav-links">
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('logout') }}">Log out</a>
-                {% else %}
-                <a href="{{ url_for('login') }}">Log in</a>
-                <a href="{{ url_for('signup') }}">Sign up</a>
-                {% endif %}
-            </nav>
+                <nav class="nav-links">
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('archive') }}">Archive</a>
+                        <a href="{{ url_for('logout') }}">Log out</a>
+                    {% else %}
+                        <a href="{{ url_for('login') }}">Log in</a>
+                        <a href="{{ url_for('signup') }}">Sign up</a>
+                    {% endif %}
+                </nav>
             {% endblock %}
         </header>
         <main>
