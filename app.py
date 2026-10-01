@@ -211,6 +211,20 @@ def log_date():
                            ended_at=request.args.get('ended_at'),
                            minutes=request.args.get('minutes'))
 
+@app.route('/you')
+@login_required
+def you():
+    return render_template('you.html')
+
+@app.route('/gallery')
+@login_required
+def gallery():
+    entries = DateEntry.query.filter(
+        DateEntry.couple_id == current_user.couple_id,
+        DateEntry.photo_path.isnot(None)
+    ).order_by(DateEntry.date.desc()).all()
+    return render_template('gallery.html', entries=entries)
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Heartclock - You{% endblock %}
+
+{% block content %}
+    <article class="auth-card">
+        <h1>{{ current_user.display_name }}</h1>
+        <p class="muted">{{ current_user.email }}</p>
+        <a href="{{ url_for('logout') }}" role="button" class="outline secondary" style="display:block; margin-top:1.5rem">Log out</a>
+    </article>
+{% endblock %}

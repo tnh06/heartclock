@@ -5,8 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Heartclock — Track Every Date{% endblock %}</title>
-    <link rel="icon"
-    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path fill=%22%23e5506b%22 d=%22M12 21s-7.5-4.6-10-9.3C.3 8.1 2.2 4 6 4c2 0 3.6 1.1 4.5 2.7C11.4 5.1 13 4 15 4c3.8 0 5.7 4.1 4 7.7C19.5 16.4 12 21 12 21z%22/></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path fill=%22%23e5506b%22 d=%22M12 21s-7.5-4.6-10-9.3C.3 8.1 2.2 4 6 4c2 0 3.6 1.1 4.5 2.7C11.4 5.1 13 4 15 4c3.8 0 5.7 4.1 4 7.7C19.5 16.4 12 21 12 21z%22/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -17,21 +16,16 @@
 </head>
 
 <body>
-    <div class="page">
-        <header class="site-header {% block header_class %}{% endblock %}">
-            <a class="brand" href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">
-                Heartclock</a>
-            {% block nav %}
+    <div class="page {% if current_user.is_authenticated %}has-bottom-nav{% endif %}">
+        <header class="site-header centered">
+            <a class="brand"
+                href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">Heartclock</a>
+            {% if not current_user.is_authenticated %}
             <nav class="nav-links">
-                {% if current_user.is_authenticated %}
-                <a href="{{ url_for('archive') }}">Archive</a>
-                <a href="{{ url_for('logout') }}">Log out</a>
-                {% else %}
                 <a href="{{ url_for('login') }}">Log in</a>
                 <a href="{{ url_for('signup') }}">Sign up</a>
-                {% endif %}
             </nav>
-            {% endblock %}
+            {% endif %}
         </header>
         <main>
             {% with messages = get_flashed_messages() %}
@@ -46,6 +40,43 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    {% if current_user.is_authenticated %}
+    <nav class="bottom-nav">
+        <div class="bottom-nav-inner">
+            <a href="{{ url_for('home_page') }}" class="{% if request.endpoint == 'home_page' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M12 21s-7.5-4.6-10-9.3C.3 8.1 2.2 4 6 4c2 0 3.6 1.1 4.5 2.7C11.4 5.1 13 4 15 4c3.8 0 5.7 4.1 4 7.7C19.5 16.4 12 21 12 21z" />
+                </svg>
+                <span>Clock</span>
+            </a>
+            <a href="{{ url_for('archive') }}" class="{% if request.endpoint == 'archive' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="4" rx="1" />
+                    <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8" />
+                    <path d="M10 13h4" />
+                </svg>
+                <span>Archive</span>
+            </a>
+            <a href="{{ url_for('gallery') }}" class="{% if request.endpoint == 'gallery' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                </svg>
+                <span>Gallery</span>
+            </a>
+            <a href="{{ url_for('you') }}" class="{% if request.endpoint == 'you' %}active{% endif %}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+                </svg>
+                <span>You</span>
+            </a>
+        </div>
+    </nav>
+    {% endif %}
 </body>
 
 </html>

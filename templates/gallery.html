@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Heartclock - Gallery{% endblock %}
+
+{% block content %}
+    <h2 style="text-align:center; margin-bottom:1.5rem">Gallery</h2>
+    {% if entries %}
+        <div class="gallery-grid">
+            {% for entry in entries %}
+                <img src="{{ url_for('static', filename='uploads/' + entry.photo_path) }}" alt="{{ entry.title }}">
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty">
+            <p>No photos yet. Add one next time you log a date.</p>
+        </div>
+    {% endif %}
+{% endblock %}
