@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Archive - Heartclock{% endblock %}
+{% block title %}Heartclock - Archive{% endblock %}
 
 {% block content %}
 <div class="section-head">
@@ -24,7 +24,11 @@
         }}{% endif %}
     </p>
     {% if entry.started_at and entry.ended_at %}
-    <p class="meta">{{ entry.started_at.strftime('%-I:%M %p') }} – {{ entry.ended_at.strftime('%-I:%M %p') }}</p>
+    <p class="meta">
+        <span class="local-time" data-utc="{{ entry.started_at.isoformat() }}Z"></span>
+        –
+        <span class="local-time" data-utc="{{ entry.ended_at.isoformat() }}Z"></span>
+    </p>
     {% endif %}
     <div class="actions">
         <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline small">Edit</a>
@@ -35,6 +39,12 @@
     </div>
 </article>
 {% endfor %}
+<script>
+    document.querySelectorAll('.local-time').forEach(el => {
+        const date = new Date(el.dataset.utc);
+        el.textContent = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    });
+</script>
 {% else %}
 <div class="empty">
     <p>No dates logged yet. Clock in on your next one, or add a past date to start the timeline.</p>

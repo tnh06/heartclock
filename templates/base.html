@@ -4,9 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Heartclock{% endblock %}</title>
+    <title>{% block title %}Heartclock — Track Every Date{% endblock %}</title>
     <link rel="icon"
-        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
+    href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><path fill=%22%23e5506b%22 d=%22M12 21s-7.5-4.6-10-9.3C.3 8.1 2.2 4 6 4c2 0 3.6 1.1 4.5 2.7C11.4 5.1 13 4 15 4c3.8 0 5.7 4.1 4 7.7C19.5 16.4 12 21 12 21z%22/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -22,26 +22,26 @@
             <a class="brand" href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">
                 Heartclock</a>
             {% block nav %}
-                <nav class="nav-links">
-                    {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('archive') }}">Archive</a>
-                        <a href="{{ url_for('logout') }}">Log out</a>
-                    {% else %}
-                        <a href="{{ url_for('login') }}">Log in</a>
-                        <a href="{{ url_for('signup') }}">Sign up</a>
-                    {% endif %}
-                </nav>
+            <nav class="nav-links">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('archive') }}">Archive</a>
+                <a href="{{ url_for('logout') }}">Log out</a>
+                {% else %}
+                <a href="{{ url_for('login') }}">Log in</a>
+                <a href="{{ url_for('signup') }}">Sign up</a>
+                {% endif %}
+            </nav>
             {% endblock %}
         </header>
         <main>
             {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class="flashes">
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+            {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
             {% endwith %}
             {% block content %}{% endblock %}
         </main>

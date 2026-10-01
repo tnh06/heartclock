@@ -143,7 +143,7 @@ def edit_date(entry_id):
         entry.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         entry.notes = request.form['notes']
         db.session.commit()
-        return redirect(url_for('home_page'))
+        return redirect(url_for('archive'))
 
     return render_template('edit_date.html', entry=entry)
 
@@ -157,7 +157,7 @@ def delete_date(entry_id):
 
     db.session.delete(entry)
     db.session.commit()
-    return redirect(url_for('home_page'))
+    return redirect(url_for('archive'))
 
 @app.route('/clock-in', methods=['POST'])
 @login_required
