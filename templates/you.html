@@ -5,6 +5,43 @@
     <article class="auth-card">
         <h1>{{ current_user.display_name }}</h1>
         <p class="muted">{{ current_user.email }}</p>
-        <a href="{{ url_for('logout') }}" role="button" class="outline secondary" style="display:block; margin-top:1.5rem">Log out</a>
     </article>
+
+    <article class="auth-card">
+        <h2>Your name</h2>
+        <p class="muted">What your partner sees you as.</p>
+        <form method="POST" action="{{ url_for('update_name') }}">
+            <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
+            <button type="submit">Save Name</button>
+        </form>
+    </article>
+
+    {% if couple %}
+        <article class="auth-card">
+            <h2>Your relationship</h2>
+            {% if partner %}
+                <p class="muted">You're paired with <strong>{{ partner.display_name }}</strong>.</p>
+            {% else %}
+                <p class="muted">Your partner hasn't joined yet. Send them this invite code:</p>
+                <code class="invite-code">{{ couple.invite_code }}</code>
+            {% endif %}
+            <form method="POST" action="{{ url_for('leave_relationship') }}" style="margin-top:1rem">
+                <button type="submit" class="outline danger-button" onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave Relationship</button>
+            </form>
+        </article>
+    {% else %}
+        <article class="auth-card">
+            <h2>You're not in a relationship</h2>
+            <p class="muted">Join your partner with their invite code, or start a new one.</p>
+            <form method="POST" action="{{ url_for('join_relationship') }}">
+                <input type="text" name="invite_code" placeholder="Invite code" required>
+                <button type="submit">Join</button>
+            </form>
+            <form method="POST" action="{{ url_for('new_code') }}" style="margin-top:0.75rem">
+                <button type="submit" class="outline secondary">Start a New Relationship</button>
+            </form>
+        </article>
+    {% endif %}
+
+    <a href="{{ url_for('logout') }}" role="button" class="outline secondary page-footer-action">Log out</a>
 {% endblock %}

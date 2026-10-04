@@ -93,10 +93,10 @@ h1, h2, h3 {
     padding: 2rem 1.5rem;
     background: linear-gradient(135deg, rgba(229, 80, 107, 0.18), rgba(120, 70, 200, 0.14));
     border: 1px solid rgba(255, 122, 143, 0.25);
-    width: 100%;
-    max-width: 380px;
+    width: 85%;
+    max-width: 320px;
     aspect-ratio: 1 / 1;
-    margin: 2rem auto;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -114,14 +114,16 @@ h1, h2, h3 {
 
 .timer {
     font-family: 'Courier New', monospace;
-    font-size: 4.5rem;
+    font-size: 2.75rem;
     margin: 0;
     color: #ff4d6a;
     text-shadow: 0 0 12px rgba(255, 77, 106, 0.6), 0 0 2px rgba(255, 77, 106, 0.8);
     background: #1a0a0d;
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     border: 2px solid rgba(255, 77, 106, 0.3);
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .clock-card form {
@@ -332,4 +334,29 @@ h1, h2, h3 {
 
 .bottom-nav a.active {
     color: var(--pico-primary);
+}
+
+.page-footer-action {
+    display: block !important;
+    max-width: 440px;
+    width: calc(100% - 2.5rem);
+    margin: 1.5rem auto 0 !important;
+}
+
+.danger-button {
+    --pico-color: #ff6b6b;
+    --pico-border-color: #ff6b6b;
+    --pico-background-color: transparent;
+}
+
+.danger-button:hover {
+    --pico-color: #ffffff;
+    --pico-background-color: #ff6b6b;
+}
+
+main:has(.clock-card) {
+    min-height: calc(100vh - 10rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
