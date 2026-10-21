@@ -11,7 +11,7 @@
 
     <article class="clock-card">
         {% if active_session %}
-            <p class="clock-label"><span class="beat">♥</span> Date in progress</p>
+            <p class="clock-label">Date in progress</p>
             <div class="timer" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</div>
             <form method="POST" action="{{ url_for('clock_out') }}">
                 <button type="submit">Clock Out</button>

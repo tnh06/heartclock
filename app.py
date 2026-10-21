@@ -32,7 +32,7 @@ def home():
 def home_page():
     if not current_user.couple_id:
         flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
 
     active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     couple = Couple.query.get(current_user.couple_id)
@@ -45,7 +45,7 @@ def home_page():
 def archive():
     if not current_user.couple_id:
         flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
 
     entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
     return render_template('archive.html', entries=entries)
@@ -174,7 +174,7 @@ def delete_date(entry_id):
 def clock_in():
     if not current_user.couple_id:
         flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
 
     existing = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     if not existing:
@@ -188,7 +188,7 @@ def clock_in():
 def clock_out():
     if not current_user.couple_id:
         flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
 
     active = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     if not active:
@@ -229,9 +229,9 @@ def log_date():
                            ended_at=request.args.get('ended_at'),
                            minutes=request.args.get('minutes'))
 
-@app.route('/you')
+@app.route('/settings')
 @login_required
-def you():
+def settings():
     couple = Couple.query.get(current_user.couple_id) if current_user.couple_id else None
     partner = None
     if couple:
@@ -239,14 +239,14 @@ def you():
             User.couple_id == couple.id,
             User.id != current_user.id
         ).first()
-    return render_template('you.html', couple=couple, partner=partner)
+    return render_template('settings.html', couple=couple, partner=partner)
 
 @app.route('/gallery')
 @login_required
 def gallery():
     if not current_user.couple_id:
         flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
 
     entries = DateEntry.query.filter(
         DateEntry.couple_id == current_user.couple_id,
@@ -254,7 +254,7 @@ def gallery():
     ).order_by(DateEntry.date.desc()).all()
     return render_template('gallery.html', entries=entries)
 
-@app.route('/you/update-name', methods=['POST'])
+@app.route('/settings/update-name', methods=['POST'])
 @login_required
 def update_name():
     name = request.form['display_name'].strip()
@@ -262,33 +262,33 @@ def update_name():
         current_user.display_name = name
         db.session.commit()
         flash("Name updated.")
-    return redirect(url_for('you'))
+    return redirect(url_for('settings'))
 
-@app.route('/you/leave', methods=['POST'])
+@app.route('/settings/leave', methods=['POST'])
 @login_required
 def leave_relationship():
     current_user.couple_id = None
     db.session.commit()
     flash("You've left the relationship.")
-    return redirect(url_for('you'))
+    return redirect(url_for('settings'))
 
-@app.route('/you/join', methods=['POST'])
+@app.route('/settings/join', methods=['POST'])
 @login_required
 def join_relationship():
     code = request.form.get('invite_code', '').strip()
     couple = Couple.query.filter_by(invite_code=code).first()
     if not couple:
         flash("Invalid invite code.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
     if User.query.filter_by(couple_id=couple.id).count() >= 2:
         flash("That couple already has two members.")
-        return redirect(url_for('you'))
+        return redirect(url_for('settings'))
     current_user.couple_id = couple.id
     db.session.commit()
     flash("Joined.")
-    return redirect(url_for('you'))
+    return redirect(url_for('settings'))
 
-@app.route('/you/new-code', methods=['POST'])
+@app.route('/settings/new-code', methods=['POST'])
 @login_required
 def new_code():
     couple = Couple(invite_code=secrets.token_hex(4))
@@ -296,7 +296,7 @@ def new_code():
     db.session.commit()
     current_user.couple_id = couple.id
     db.session.commit()
-    return redirect(url_for('you'))
+    return redirect(url_for('settings'))
 
 if __name__ == '__main__':
     with app.app_context():
