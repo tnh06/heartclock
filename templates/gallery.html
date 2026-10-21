@@ -1,8 +1,11 @@
 {% extends "base.html" %}
-{% block title %}Heartclock • Gallery{% endblock %}
+{% block title %}Heartclock - Gallery{% endblock %}
 
 {% block content %}
-    <h2 style="text-align:center; margin-bottom:1.5rem">Gallery</h2>
+    <div class="section-head">
+        <h2>Gallery</h2>
+    </div>
+
     {% if entries %}
         <div class="gallery-grid">
             {% for entry in entries %}

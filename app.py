@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry, ActiveSession
 import secrets
 import os
 from datetime import datetime
+from functools import wraps
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heartclock.db'
@@ -21,6 +22,15 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+def couple_required(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if not current_user.couple_id:
+            flash("You're not in a relationship yet. Join one or start one in Settings.")
+            return redirect(url_for('settings'))
+        return f(*args, **kwargs)
+    return wrapper
+
 @app.route('/')
 def home():
     if current_user.is_authenticated:
@@ -29,11 +39,8 @@ def home():
 
 @app.route('/home')
 @login_required
+@couple_required
 def home_page():
-    if not current_user.couple_id:
-        flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('settings'))
-
     active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     couple = Couple.query.get(current_user.couple_id)
     member_count = User.query.filter_by(couple_id=current_user.couple_id).count()
@@ -42,11 +49,8 @@ def home_page():
 
 @app.route('/archive')
 @login_required
+@couple_required
 def archive():
-    if not current_user.couple_id:
-        flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('settings'))
-
     entries = DateEntry.query.filter_by(couple_id=current_user.couple_id).order_by(DateEntry.date.desc()).all()
     return render_template('archive.html', entries=entries)
 
@@ -60,7 +64,7 @@ def signup():
 
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
-            flash("That email already registered.")
+            flash("That email is already registered.")
             return redirect(url_for('signup'))
 
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
@@ -71,7 +75,7 @@ def signup():
                 flash("That invite code doesn't match any account.")
                 return redirect(url_for('signup'))
             if User.query.filter_by(couple_id=couple.id).count() >= 2:
-                flash("That couple already has two members")
+                flash("That couple already has two members.")
                 return redirect(url_for('signup'))
         else:
             couple = Couple(invite_code=secrets.token_hex(4))
@@ -118,6 +122,7 @@ def logout():
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
+@couple_required
 def add_date():
     if request.method == 'POST':
         title = request.form['title']
@@ -142,11 +147,12 @@ def add_date():
 
 @app.route('/edit/<int:entry_id>', methods=['GET', 'POST'])
 @login_required
+@couple_required
 def edit_date(entry_id):
     entry = DateEntry.query.get_or_404(entry_id)
 
     if entry.couple_id != current_user.couple_id:
-        return "Not authorized", 403
+        abort(403)
 
     if request.method == 'POST':
         entry.title = request.form['title']
@@ -159,11 +165,12 @@ def edit_date(entry_id):
 
 @app.route('/delete/<int:entry_id>', methods=['POST'])
 @login_required
+@couple_required
 def delete_date(entry_id):
     entry = DateEntry.query.get_or_404(entry_id)
 
     if entry.couple_id != current_user.couple_id:
-        return "Not authorized", 403
+        abort(403)
 
     db.session.delete(entry)
     db.session.commit()
@@ -171,11 +178,8 @@ def delete_date(entry_id):
 
 @app.route('/clock-in', methods=['POST'])
 @login_required
+@couple_required
 def clock_in():
-    if not current_user.couple_id:
-        flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('settings'))
-
     existing = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     if not existing:
         session = ActiveSession(couple_id=current_user.couple_id)
@@ -185,11 +189,8 @@ def clock_in():
 
 @app.route('/clock-out', methods=['POST'])
 @login_required
+@couple_required
 def clock_out():
-    if not current_user.couple_id:
-        flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('settings'))
-
     active = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     if not active:
         return redirect(url_for('home_page'))
@@ -208,6 +209,7 @@ def clock_out():
 
 @app.route('/log-date', methods=['GET', 'POST'])
 @login_required
+@couple_required
 def log_date():
     if request.method == 'POST':
         new_entry = DateEntry(
@@ -229,6 +231,16 @@ def log_date():
                            ended_at=request.args.get('ended_at'),
                            minutes=request.args.get('minutes'))
 
+@app.route('/gallery')
+@login_required
+@couple_required
+def gallery():
+    entries = DateEntry.query.filter(
+        DateEntry.couple_id == current_user.couple_id,
+        DateEntry.photo_path.isnot(None)
+    ).order_by(DateEntry.date.desc()).all()
+    return render_template('gallery.html', entries=entries)
+
 @app.route('/settings')
 @login_required
 def settings():
@@ -240,19 +252,6 @@ def settings():
             User.id != current_user.id
         ).first()
     return render_template('settings.html', couple=couple, partner=partner)
-
-@app.route('/gallery')
-@login_required
-def gallery():
-    if not current_user.couple_id:
-        flash("You're not in a relationship yet. Join one or start one below.")
-        return redirect(url_for('settings'))
-
-    entries = DateEntry.query.filter(
-        DateEntry.couple_id == current_user.couple_id,
-        DateEntry.photo_path.isnot(None)
-    ).order_by(DateEntry.date.desc()).all()
-    return render_template('gallery.html', entries=entries)
 
 @app.route('/settings/update-name', methods=['POST'])
 @login_required
@@ -297,6 +296,19 @@ def new_code():
     current_user.couple_id = couple.id
     db.session.commit()
     return redirect(url_for('settings'))
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('error.html', code=403, message="You don't have access to that."), 403
+
+@app.errorhandler(404)
+def not_found(e):
+    return render_template('error.html', code=404, message="That page doesn't exist."), 404
+
+@app.errorhandler(500)
+def server_error(e):
+    db.session.rollback()
+    return render_template('error.html', code=500, message="Something went wrong on our end."), 500
 
 if __name__ == '__main__':
     with app.app_context():
