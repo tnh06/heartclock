@@ -2,56 +2,92 @@
 {% block title %}Heartclock - Settings{% endblock %}
 
 {% block content %}
-<article class="auth-card">
-    <h2>Your name</h2>
-    <p class="muted">What your partner sees you as.</p>
-    <form method="POST" action="{{ url_for('update_name') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
-        <button type="submit">Save Name</button>
-    </form>
-</article>
+    <article class="auth-card">
+        <h2>Your name</h2>
+        <p class="muted">What your partner sees you as.</p>
+        <form method="POST" action="{{ url_for('update_name') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
+            <button type="submit">Save Name</button>
+        </form>
+    </article>
 
-{% if couple %}
-<article class="auth-card">
-    <h2>Invite code</h2>
-    <p class="muted">Share this with your partner so they can join you.</p>
-    <code class="invite-code">{{ couple.invite_code }}</code>
-</article>
+    {% if couple %}
+        <article class="auth-card">
+            <h2>Invite code</h2>
+            <p class="muted">Share this with your partner so they can join you.</p>
+            <code class="invite-code">{{ couple.invite_code }}</code>
+        </article>
 
-<article class="auth-card">
-    <h2>Your relationship</h2>
-    {% if partner %}
-    <p class="muted">You're paired with <strong>{{ partner.display_name }}</strong>.</p>
+        <article class="auth-card">
+            <h2>Your relationship</h2>
+            {% if partner %}
+                <p class="muted">You're paired with <strong>{{ partner.display_name }}</strong>.</p>
+            {% else %}
+                <p class="muted">Your partner hasn't joined yet.</p>
+            {% endif %}
+            <form method="POST" action="{{ url_for('leave_relationship') }}" style="margin-top:1rem">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="outline danger-button" onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave Relationship</button>
+            </form>
+        </article>
     {% else %}
-    <p class="muted">Your partner hasn't joined yet.</p>
+        <article class="auth-card">
+            <h2>You're not in a relationship</h2>
+            <p class="muted">Join your partner with their invite code, or start a new one.</p>
+            <form method="POST" action="{{ url_for('join_relationship') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="text" name="invite_code" placeholder="Invite code" required>
+                <button type="submit">Join</button>
+            </form>
+            <form method="POST" action="{{ url_for('new_code') }}" style="margin-top:0.75rem">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="outline secondary">Start a New Relationship</button>
+            </form>
+        </article>
     {% endif %}
-    <form method="POST" action="{{ url_for('leave_relationship') }}" style="margin-top:1rem">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" class="outline danger-button"
-            onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave
-            Relationship</button>
-    </form>
-</article>
-{% else %}
-<article class="auth-card">
-    <h2>You're not in a relationship</h2>
-    <p class="muted">Join your partner with their invite code, or start a new one.</p>
-    <form method="POST" action="{{ url_for('join_relationship') }}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="text" name="invite_code" placeholder="Invite code" required>
-        <button type="submit">Join</button>
-    </form>
-    <form method="POST" action="{{ url_for('new_code') }}" style="margin-top:0.75rem">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" class="outline secondary">Start a New Relationship</button>
-    </form>
-</article>
-{% endif %}
 
-<form method="POST" action="{{ url_for('logout') }}" class="page-footer-action">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <button type="submit" class="outline secondary">Log out</button>
-</form>
+    <article class="auth-card">
+        <h2>Account</h2>
+
+        <details>
+            <summary>Change email</summary>
+            <p class="muted">Current: {{ current_user.email }}</p>
+            <form method="POST" action="{{ url_for('change_email') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="email" name="email" placeholder="New email" required>
+                <input type="password" name="password" placeholder="Current password" required>
+                <button type="submit">Update Email</button>
+            </form>
+        </details>
+
+        <details>
+            <summary>Change password</summary>
+            <form method="POST" action="{{ url_for('change_password') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="password" name="current_password" placeholder="Current password" required>
+                <input type="password" name="new_password" placeholder="New password" minlength="14" maxlength="72"
+                       pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{14,72}"
+                       title="At least 14 characters, with an uppercase letter, a lowercase letter and a number" required>
+                <small class="muted">At least 14 characters, with an uppercase letter, a lowercase letter and a number.</small>
+                <input type="password" name="confirm_password" placeholder="Confirm new password" style="margin-top:1rem" required>
+                <button type="submit">Update Password</button>
+            </form>
+        </details>
+
+        <details>
+            <summary>Delete account</summary>
+            <p class="muted">This can't be undone. If you're the last person in your relationship, all of its dates and photos are deleted too.</p>
+            <form method="POST" action="{{ url_for('delete_account') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="password" name="password" placeholder="Current password" required>
+                <button type="submit" class="outline danger-button" onclick="return confirm('Delete your account permanently?')">Delete Account</button>
+            </form>
+        </details>
+    </article>
+
+    <form method="POST" action="{{ url_for('logout') }}" class="page-footer-action">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="outline secondary">Log out</button>
+    </form>
 {% endblock %}

@@ -74,6 +74,19 @@ def couple_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+def password_error(pw):
+    if len(pw) < 14:
+        return "Password must be at least 14 characters."
+    if len(pw.encode('utf-8')) > 72:
+        return "Password is too long. Use 72 characters or fewer."
+    if not any(c.isupper() for c in pw):
+        return "Password needs at least one uppercase letter."
+    if not any(c.islower() for c in pw):
+        return "Password needs at least one lowercase letter."
+    if not any(c.isdigit() for c in pw):
+        return "Password needs at least one number."
+    return None
+
 @app.route('/')
 def home():
     if current_user.is_authenticated:
@@ -362,6 +375,76 @@ def new_code():
     current_user.couple_id = couple.id
     db.session.commit()
     return redirect(url_for('settings'))
+
+@app.route('/settings/change-email', methods=['POST'])
+@login_required
+def change_email():
+    if not bcrypt.check_password_hash(current_user.password_hash, request.form['password']):
+        flash("Incorrect password.")
+        return redirect(url_for('settings'))
+
+    new_email = request.form['email'].strip()
+    taken = User.query.filter(User.email == new_email, User.id != current_user.id).first()
+    if taken:
+        flash("That email is already in use.")
+        return redirect(url_for('settings'))
+
+    current_user.email = new_email
+    db.session.commit()
+    flash("Email updated.")
+    return redirect(url_for('settings'))
+
+@app.route('/settings/change-password', methods=['POST'])
+@login_required
+def change_password():
+    current = request.form['current_password']
+    new = request.form['new_password']
+    confirm = request.form['confirm_password']
+    error = password_error(new)
+
+    if not bcrypt.check_password_hash(current_user.password_hash, current):
+        flash("Current password is incorrect.")
+    elif error:
+        flash(error)
+    elif new != confirm:
+        flash("New passwords don't match.")
+    else:
+        current_user.password_hash = bcrypt.generate_password_hash(new).decode('utf-8')
+        db.session.commit()
+        flash("Password updated.")
+    return redirect(url_for('settings'))
+
+@app.route('/settings/delete-account', methods=['POST'])
+@login_required
+def delete_account():
+    if not bcrypt.check_password_hash(current_user.password_hash, request.form['password']):
+        flash("Incorrect password.")
+        return redirect(url_for('settings'))
+
+    user = current_user._get_current_object()
+    couple_id = user.couple_id
+    last_member = bool(couple_id) and User.query.filter_by(couple_id=couple_id).count() == 1
+
+    logout_user()
+
+    # Entries this person added stay with the couple, just without an author
+    DateEntry.query.filter_by(author_id=user.id).update({'author_id': None})
+
+    if last_member:
+        # Nobody is left, so remove the couple's dates, photos and timer too
+        for entry in DateEntry.query.filter_by(couple_id=couple_id).all():
+            for p in entry.photos:
+                delete_photo_file(p.filename)
+            db.session.delete(entry)
+        ActiveSession.query.filter_by(couple_id=couple_id).delete()
+
+    db.session.delete(user)
+    if last_member:
+        db.session.delete(Couple.query.get(couple_id))
+    db.session.commit()
+
+    flash("Your account has been deleted.")
+    return redirect(url_for('login'))
 
 @app.errorhandler(413)
 def too_large(e):
