@@ -2,35 +2,35 @@
 {% block title %}Heartclock - Log Date{% endblock %}
 
 {% block content %}
-<article class="auth-card">
-    <h1>How was it?</h1>
-    <p class="muted">You clocked {{ (minutes|int // 60) }}h {{ (minutes|int % 60) }}m together.</p>
-    <label>Photos (optional, up to 10)
-        <input type="file" name="photos" accept="image/*" multiple>
-    </label>
-    <form method="POST" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="hidden" name="started_at" value="{{ started_at }}">
-        <input type="hidden" name="ended_at" value="{{ ended_at }}">
-        <input type="hidden" name="minutes" value="{{ minutes }}">
-        <input type="hidden" name="local_date" id="local_date">
-        <label>Title
-            <input type="text" name="title" autocomplete="off" required>
-        </label>
-        <label>Notes
-            <textarea name="notes" rows="4"></textarea>
-        </label>
-        <div class="form-actions">
-            <button type="submit">Save Date</button>
-            <a href="{{ url_for('home_page') }}" role="button" class="outline secondary">Discard</a>
-        </div>
-    </form>
-</article>
+    <article class="auth-card">
+        <h1>How was it?</h1>
+        <p class="muted">You clocked {{ (minutes|int // 60) }}h {{ (minutes|int % 60) }}m together.</p>
+        <form method="POST" enctype="multipart/form-data" autocomplete="off">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="started_at" value="{{ started_at }}">
+            <input type="hidden" name="ended_at" value="{{ ended_at }}">
+            <input type="hidden" name="minutes" value="{{ minutes }}">
+            <input type="hidden" name="local_date" id="local_date">
+            <label>Title
+                <input type="text" name="title" autocomplete="off" required>
+            </label>
+            <label>Notes
+                <textarea name="notes" rows="4"></textarea>
+            </label>
+            <label>Photos (optional, up to 10)
+                <input type="file" name="photos" accept="image/*" multiple>
+            </label>
+            <div class="form-actions">
+                <button type="submit">Save Date</button>
+                <a href="{{ url_for('home_page') }}" role="button" class="outline secondary">Discard</a>
+            </div>
+        </form>
+    </article>
 
-<script>
-    const ended = new Date("{{ ended_at }}Z");
-    const pad = n => String(n).padStart(2, '0');
-    document.getElementById('local_date').value =
-        `${ended.getFullYear()}-${pad(ended.getMonth() + 1)}-${pad(ended.getDate())}`;
-</script>
+    <script>
+        const ended = new Date("{{ ended_at }}Z");
+        const pad = n => String(n).padStart(2, '0');
+        document.getElementById('local_date').value =
+            `${ended.getFullYear()}-${pad(ended.getMonth() + 1)}-${pad(ended.getDate())}`;
+    </script>
 {% endblock %}
