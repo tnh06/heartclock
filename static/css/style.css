@@ -351,5 +351,5 @@ main:has(.clock-card) {
     min-height: calc(100vh - 10rem);
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: safe center;
 }
