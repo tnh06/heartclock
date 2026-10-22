@@ -13,6 +13,7 @@
         <input type="hidden" name="started_at" value="{{ started_at }}">
         <input type="hidden" name="ended_at" value="{{ ended_at }}">
         <input type="hidden" name="minutes" value="{{ minutes }}">
+        <input type="hidden" name="local_date" id="local_date">
         <label>Title
             <input type="text" name="title" autocomplete="off" required>
         </label>
@@ -25,4 +26,11 @@
         </div>
     </form>
 </article>
+
+<script>
+    const ended = new Date("{{ ended_at }}Z");
+    const pad = n => String(n).padStart(2, '0');
+    document.getElementById('local_date').value =
+        `${ended.getFullYear()}-${pad(ended.getMonth() + 1)}-${pad(ended.getDate())}`;
+</script>
 {% endblock %}

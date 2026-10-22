@@ -279,11 +279,16 @@ def clock_status():
 @couple_required
 def log_date():
     if request.method == 'POST':
+        try:
+            entry_date = datetime.strptime(request.form.get('local_date', ''), '%Y-%m-%d').date()
+        except ValueError:
+            entry_date = datetime.utcnow().date()
+
         new_entry = DateEntry(
             couple_id=current_user.couple_id,
             author_id=current_user.id,
             title=request.form['title'],
-            date=datetime.now().date(),
+            date=entry_date,
             notes=request.form['notes'],
             duration_minutes=int(request.form['minutes']),
             started_at=datetime.fromisoformat(request.form['started_at']),
