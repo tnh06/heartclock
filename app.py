@@ -9,6 +9,7 @@ from datetime import datetime
 from functools import wraps
 import uuid
 from PIL import Image, ImageOps
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heartclock.db'
@@ -74,6 +75,20 @@ def couple_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+def generate_invite_code():
+    while True:
+        code = ''.join(secrets.choice(CODE_ALPHABET) for _ in range(6))
+        if not Couple.query.filter(func.upper(Couple.invite_code) == code).first():
+            return code
+
+def find_couple(code):
+    code = code.strip().upper()
+    if not code:
+        return None
+    return Couple.query.filter(func.upper(Couple.invite_code) == code).first()
+
 def password_error(pw):
     if len(pw) < 14:
         return "Password must be at least 14 characters."
@@ -126,7 +141,7 @@ def signup():
         password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
 
         if invite_code:
-            couple = Couple.query.filter_by(invite_code=invite_code).first()
+            couple = find_couple(invite_code)
             if not couple:
                 flash("That invite code doesn't match any account.")
                 return redirect(url_for('signup'))
@@ -134,7 +149,7 @@ def signup():
                 flash("That couple already has two members.")
                 return redirect(url_for('signup'))
         else:
-            couple = Couple(invite_code=secrets.token_hex(4))
+            couple = Couple(invite_code=generate_invite_code())
             db.session.add(couple)
             db.session.commit()
 
@@ -359,7 +374,7 @@ def leave_relationship():
 @login_required
 def join_relationship():
     code = request.form.get('invite_code', '').strip()
-    couple = Couple.query.filter_by(invite_code=code).first()
+    couple = find_couple(code)
     if not couple:
         flash("Invalid invite code.")
         return redirect(url_for('settings'))
@@ -374,7 +389,7 @@ def join_relationship():
 @app.route('/settings/new-code', methods=['POST'])
 @login_required
 def new_code():
-    couple = Couple(invite_code=secrets.token_hex(4))
+    couple = Couple(invite_code=generate_invite_code())
     db.session.add(couple)
     db.session.commit()
     current_user.couple_id = couple.id

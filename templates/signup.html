@@ -13,7 +13,8 @@
                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{14,72}"
                    title="At least 14 characters, with an uppercase letter, a lowercase letter and a number" required>
             <small class="muted">At least 14 characters, with an uppercase letter, a lowercase letter and a number.</small>
-            <input type="text" name="invite_code" placeholder="Invite code (optional)" style="margin-top:1rem">
+            <input type="text" name="invite_code" placeholder="Invite code (optional)"
+                   autocapitalize="characters" autocomplete="off" style="margin-top:1rem; text-transform:uppercase">
             <button type="submit">Sign Up</button>
         </form>
         <p class="muted">Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
