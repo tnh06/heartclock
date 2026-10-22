@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry, ActiveSession
@@ -13,6 +14,8 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-later
 
 db.init_app(app)
 bcrypt = Bcrypt(app)
+app.config['WTF_CSRF_TIME_LIMIT'] = None
+csrf = CSRFProtect(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -114,7 +117,7 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
@@ -316,6 +319,11 @@ def not_found(e):
 def server_error(e):
     db.session.rollback()
     return render_template('error.html', code=500, message="Something went wrong on our end."), 500
+
+@app.errorhandler(CSRFError)
+def csrf_error(e):
+    flash("Your session expired. Please try again.")
+    return redirect(request.referrer or url_for('home'))
 
 if __name__ == '__main__':
     with app.app_context():

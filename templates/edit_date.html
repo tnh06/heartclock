@@ -5,6 +5,7 @@
 <article class="auth-card">
     <h1>Edit date</h1>
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label>Title
             <input type="text" name="title" value="{{ entry.title }}" required>
         </label>

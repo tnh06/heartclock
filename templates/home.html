@@ -14,11 +14,13 @@
             <p class="clock-label">Date in progress</p>
             <div class="timer" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</div>
             <form method="POST" action="{{ url_for('clock_out') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Clock Out</button>
             </form>
         {% else %}
             <p class="clock-label">Together right now?</p>
             <form method="POST" action="{{ url_for('clock_in') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit">Clock In</button>
             </form>
         {% endif %}

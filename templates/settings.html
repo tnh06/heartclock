@@ -2,46 +2,56 @@
 {% block title %}Heartclock - Settings{% endblock %}
 
 {% block content %}
-    <article class="auth-card">
-        <h2>Your name</h2>
-        <p class="muted">What your partner sees you as.</p>
-        <form method="POST" action="{{ url_for('update_name') }}">
-            <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
-            <button type="submit">Save Name</button>
-        </form>
-    </article>
+<article class="auth-card">
+    <h2>Your name</h2>
+    <p class="muted">What your partner sees you as.</p>
+    <form method="POST" action="{{ url_for('update_name') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
+        <button type="submit">Save Name</button>
+    </form>
+</article>
 
-    {% if couple %}
-        <article class="auth-card">
-            <h2>Invite code</h2>
-            <p class="muted">Share this with your partner so they can join you.</p>
-            <code class="invite-code">{{ couple.invite_code }}</code>
-        </article>
+{% if couple %}
+<article class="auth-card">
+    <h2>Invite code</h2>
+    <p class="muted">Share this with your partner so they can join you.</p>
+    <code class="invite-code">{{ couple.invite_code }}</code>
+</article>
 
-        <article class="auth-card">
-            <h2>Your relationship</h2>
-            {% if partner %}
-                <p class="muted">You're paired with <strong>{{ partner.display_name }}</strong>.</p>
-            {% else %}
-                <p class="muted">Your partner hasn't joined yet.</p>
-            {% endif %}
-            <form method="POST" action="{{ url_for('leave_relationship') }}" style="margin-top:1rem">
-                <button type="submit" class="outline danger-button" onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave Relationship</button>
-            </form>
-        </article>
+<article class="auth-card">
+    <h2>Your relationship</h2>
+    {% if partner %}
+    <p class="muted">You're paired with <strong>{{ partner.display_name }}</strong>.</p>
     {% else %}
-        <article class="auth-card">
-            <h2>You're not in a relationship</h2>
-            <p class="muted">Join your partner with their invite code, or start a new one.</p>
-            <form method="POST" action="{{ url_for('join_relationship') }}">
-                <input type="text" name="invite_code" placeholder="Invite code" required>
-                <button type="submit">Join</button>
-            </form>
-            <form method="POST" action="{{ url_for('new_code') }}" style="margin-top:0.75rem">
-                <button type="submit" class="outline secondary">Start a New Relationship</button>
-            </form>
-        </article>
+    <p class="muted">Your partner hasn't joined yet.</p>
     {% endif %}
+    <form method="POST" action="{{ url_for('leave_relationship') }}" style="margin-top:1rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="outline danger-button"
+            onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave
+            Relationship</button>
+    </form>
+</article>
+{% else %}
+<article class="auth-card">
+    <h2>You're not in a relationship</h2>
+    <p class="muted">Join your partner with their invite code, or start a new one.</p>
+    <form method="POST" action="{{ url_for('join_relationship') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="text" name="invite_code" placeholder="Invite code" required>
+        <button type="submit">Join</button>
+    </form>
+    <form method="POST" action="{{ url_for('new_code') }}" style="margin-top:0.75rem">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="outline secondary">Start a New Relationship</button>
+    </form>
+</article>
+{% endif %}
 
-    <a href="{{ url_for('logout') }}" role="button" class="outline secondary page-footer-action">Log out</a>
+<form method="POST" action="{{ url_for('logout') }}" class="page-footer-action">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="outline secondary">Log out</button>
+</form>
 {% endblock %}

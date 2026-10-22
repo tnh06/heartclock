@@ -6,6 +6,7 @@
         <h1>How was it?</h1>
         <p class="muted">You clocked {{ (minutes|int // 60) }}h {{ (minutes|int % 60) }}m together.</p>
         <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="started_at" value="{{ started_at }}">
             <input type="hidden" name="ended_at" value="{{ ended_at }}">
             <input type="hidden" name="minutes" value="{{ minutes }}">
