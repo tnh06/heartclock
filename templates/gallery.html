@@ -6,15 +6,17 @@
         <h2>Gallery</h2>
     </div>
 
-    {% if entries %}
+    {% if photos %}
         <div class="gallery-grid">
-            {% for entry in entries %}
-                <img src="{{ url_for('static', filename='uploads/' + entry.photo_path) }}" alt="{{ entry.title }}">
+            {% for p in photos %}
+                <a href="{{ url_for('serve_photo', filename=p.filename) }}" target="_blank">
+                    <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ p.entry.title }}" loading="lazy">
+                </a>
             {% endfor %}
         </div>
     {% else %}
         <div class="empty">
-            <p>No photos yet. Add one next time you log a date.</p>
+            <p>No photos yet. Add some next time you log a date.</p>
         </div>
     {% endif %}
 {% endblock %}

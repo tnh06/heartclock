@@ -24,6 +24,7 @@ class DateEntry(db.Model):
     date = db.Column(db.Date)
     notes = db.Column(db.Text)
     photo_path = db.Column(db.String(300), nullable=True)
+    photos = db.relationship('Photo', backref='entry', cascade='all, delete-orphan', order_by='Photo.id')
     duration_minutes = db.Column(db.Integer, nullable=True)
     started_at = db.Column(db.DateTime, nullable=True)
     ended_at = db.Column(db.DateTime, nullable=True)
@@ -32,3 +33,9 @@ class ActiveSession(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     couple_id = db.Column(db.Integer, db.ForeignKey('couple.id'), nullable=False)
     started_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class Photo(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    entry_id = db.Column(db.Integer, db.ForeignKey('date_entry.id'), nullable=False)
+    filename = db.Column(db.String(300), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

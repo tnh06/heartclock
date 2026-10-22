@@ -1,12 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify, send_from_directory
 from flask_wtf.csrf import CSRFProtect, CSRFError
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
-from models import db, User, Couple, DateEntry, ActiveSession
+from models import db, User, Couple, DateEntry, ActiveSession, Photo
 import secrets
 import os
 from datetime import datetime
 from functools import wraps
+import uuid
+from PIL import Image, ImageOps
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///heartclock.db'
@@ -16,6 +18,44 @@ db.init_app(app)
 bcrypt = Bcrypt(app)
 app.config['WTF_CSRF_TIME_LIMIT'] = None
 csrf = CSRFProtect(app)
+
+UPLOAD_FOLDER = os.path.join(app.instance_path, 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+MAX_PHOTOS = 10
+
+def save_photo(file):
+    try:
+        img = Image.open(file.stream)
+        img = ImageOps.exif_transpose(img)
+        img = img.convert('RGB')
+        img.thumbnail((1600, 1600))
+    except Exception:
+        return None
+    filename = f"{uuid.uuid4().hex}.jpg"
+    img.save(os.path.join(UPLOAD_FOLDER, filename), 'JPEG', quality=85)
+    return filename
+
+def delete_photo_file(filename):
+    path = os.path.join(UPLOAD_FOLDER, filename)
+    if os.path.exists(path):
+        os.remove(path)
+
+def add_photos(entry, files):
+    skipped = 0
+    for f in files:
+        if not f or not f.filename:
+            continue
+        if len(entry.photos) >= MAX_PHOTOS:
+            skipped += 1
+            continue
+        filename = save_photo(f)
+        if filename:
+            entry.photos.append(Photo(filename=filename))
+        else:
+            skipped += 1
+    if skipped:
+        flash(f"{skipped} photo(s) were skipped (not a valid image, or over the {MAX_PHOTOS}-photo limit).")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -128,23 +168,17 @@ def logout():
 @couple_required
 def add_date():
     if request.method == 'POST':
-        title = request.form['title']
-        date_str = request.form['date']
-        notes = request.form['notes']
-
-        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
-
         new_entry = DateEntry(
             couple_id=current_user.couple_id,
             author_id=current_user.id,
-            title=title,
-            date=date_obj,
-            notes=notes
+            title=request.form['title'],
+            date=datetime.strptime(request.form['date'], '%Y-%m-%d').date(),
+            notes=request.form['notes']
         )
         db.session.add(new_entry)
+        add_photos(new_entry, request.files.getlist('photos'))
         db.session.commit()
-
-        return redirect(url_for('home_page'))
+        return redirect(url_for('archive'))
 
     return render_template('add_date.html')
 
@@ -161,6 +195,14 @@ def edit_date(entry_id):
         entry.title = request.form['title']
         entry.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         entry.notes = request.form['notes']
+
+        remove_ids = {int(i) for i in request.form.getlist('remove_photo') if i.isdigit()}
+        for p in list(entry.photos):
+            if p.id in remove_ids:
+                delete_photo_file(p.filename)
+                entry.photos.remove(p)
+
+        add_photos(entry, request.files.getlist('photos'))
         db.session.commit()
         return redirect(url_for('archive'))
 
@@ -175,6 +217,8 @@ def delete_date(entry_id):
     if entry.couple_id != current_user.couple_id:
         abort(403)
 
+    for p in entry.photos:
+        delete_photo_file(p.filename)
     db.session.delete(entry)
     db.session.commit()
     return redirect(url_for('archive'))
@@ -233,6 +277,7 @@ def log_date():
             ended_at=datetime.fromisoformat(request.form['ended_at'])
         )
         db.session.add(new_entry)
+        add_photos(new_entry, request.files.getlist('photos'))
         db.session.commit()
         return redirect(url_for('archive'))
 
@@ -245,11 +290,22 @@ def log_date():
 @login_required
 @couple_required
 def gallery():
-    entries = DateEntry.query.filter(
-        DateEntry.couple_id == current_user.couple_id,
-        DateEntry.photo_path.isnot(None)
-    ).order_by(DateEntry.date.desc()).all()
-    return render_template('gallery.html', entries=entries)
+    photos = (Photo.query
+              .join(DateEntry, Photo.entry_id == DateEntry.id)
+              .filter(DateEntry.couple_id == current_user.couple_id)
+              .order_by(DateEntry.date.desc(), Photo.id.desc())
+              .all())
+    return render_template('gallery.html', photos=photos)
+
+@app.route('/photo/<filename>')
+@login_required
+@couple_required
+def serve_photo(filename):
+    Photo.query.join(DateEntry, Photo.entry_id == DateEntry.id).filter(
+        Photo.filename == filename,
+        DateEntry.couple_id == current_user.couple_id
+    ).first_or_404()
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 @app.route('/settings')
 @login_required
@@ -306,6 +362,11 @@ def new_code():
     current_user.couple_id = couple.id
     db.session.commit()
     return redirect(url_for('settings'))
+
+@app.errorhandler(413)
+def too_large(e):
+    flash("That upload is too large. The limit is 100 MB per save.")
+    return redirect(request.referrer or url_for('home'))
 
 @app.errorhandler(403)
 def forbidden(e):

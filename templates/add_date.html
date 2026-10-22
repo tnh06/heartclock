@@ -4,7 +4,10 @@
 {% block content %}
 <article class="auth-card">
     <h1>Add a date</h1>
-    <form method="POST" autocomplete="off">
+    <label>Photos (optional, up to 10)
+        <input type="file" name="photos" accept="image/*" multiple>
+    </label>
+    <form method="POST" enctype="multipart/form-data">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <label>Title
             <input type="text" name="title" autocomplete="off" required>

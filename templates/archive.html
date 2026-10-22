@@ -1,54 +1,67 @@
 {% extends "base.html" %}
-{% block title %}Heartclock • Archive{% endblock %}
+{% block title %}Heartclock - Archive{% endblock %}
 
 {% block content %}
-<div class="section-head">
-    <h2>Your dates</h2>
-    <a href="{{ url_for('add_date') }}" role="button" class="small">+ Add a date</a>
-</div>
+    <div class="section-head">
+        <h2>Your dates</h2>
+        <a href="{{ url_for('add_date') }}" role="button" class="small">+ Add a date</a>
+    </div>
 
-{% if entries %}
-{% for entry in entries %}
-<article class="date-card">
-    <div class="date-card-top">
-        <h3>{{ entry.title }}</h3>
-        {% if entry.duration_minutes %}
-        <span class="pill">
-            {% if entry.duration_minutes >= 60 %}{{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60
-            }}m{% else %}{{ entry.duration_minutes }}m{% endif %}
-        </span>
-        {% endif %}
-    </div>
-    <p class="meta">
-        {{ entry.date.strftime('%a %d %b %Y') }}{% if entry.author %} &middot; Added by {{ entry.author.display_name
-        }}{% endif %}
-    </p>
-    {% if entry.started_at and entry.ended_at %}
-    <p class="meta">
-        <span class="local-time" data-utc="{{ entry.started_at.isoformat() }}Z"></span>
-        –
-        <span class="local-time" data-utc="{{ entry.ended_at.isoformat() }}Z"></span>
-    </p>
+    {% if entries %}
+        {% for entry in entries %}
+            <article class="date-card">
+                <div class="date-card-top">
+                    <h3>{{ entry.title }}</h3>
+                    {% if entry.duration_minutes %}
+                        <span class="pill">
+                            {% if entry.duration_minutes >= 60 %}{{ entry.duration_minutes // 60 }}h {{ entry.duration_minutes % 60 }}m{% else %}{{ entry.duration_minutes }}m{% endif %}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p class="meta">
+                    {{ entry.date.strftime('%a %d %b %Y') }}{% if entry.author %} &middot; Added by {{ entry.author.display_name }}{% endif %}
+                </p>
+
+                {% if entry.started_at and entry.ended_at %}
+                    <p class="meta">
+                        <span class="local-time" data-utc="{{ entry.started_at.isoformat() }}Z"></span>
+                        &ndash;
+                        <span class="local-time" data-utc="{{ entry.ended_at.isoformat() }}Z"></span>
+                    </p>
+                {% endif %}
+
+                {% if entry.notes %}
+                    <p class="notes">{{ entry.notes }}</p>
+                {% endif %}
+
+                {% if entry.photos %}
+                    <div class="photo-strip">
+                        {% for p in entry.photos %}
+                            <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ entry.title }}" loading="lazy">
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="actions">
+                    <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline small">Edit</a>
+                    <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="outline secondary small" onclick="return confirm('Delete this date?')">Delete</button>
+                    </form>
+                </div>
+            </article>
+        {% endfor %}
+    {% else %}
+        <div class="empty">
+            <p>No dates logged yet. Clock in on your next one, or add a past date to start the timeline.</p>
+        </div>
     {% endif %}
-    <div class="actions">
-        <a href="{{ url_for('edit_date', entry_id=entry.id) }}" role="button" class="outline small">Edit</a>
-        <form method="POST" action="{{ url_for('delete_date', entry_id=entry.id) }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <button type="submit" class="outline secondary small"
-                onclick="return confirm('Delete this date?')">Delete</button>
-        </form>
-    </div>
-</article>
-{% endfor %}
-<script>
-    document.querySelectorAll('.local-time').forEach(el => {
-        const date = new Date(el.dataset.utc);
-        el.textContent = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    });
-</script>
-{% else %}
-<div class="empty">
-    <p>No dates logged yet. Clock in on your next one, or add a past date to start the timeline.</p>
-</div>
-{% endif %}
+
+    <script>
+        document.querySelectorAll('.local-time').forEach(el => {
+            const date = new Date(el.dataset.utc);
+            el.textContent = date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        });
+    </script>
 {% endblock %}
