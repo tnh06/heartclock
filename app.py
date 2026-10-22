@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, jsonify
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from flask_bcrypt import Bcrypt
 from models import db, User, Couple, DateEntry, ActiveSession
@@ -206,6 +206,13 @@ def clock_out():
                              started_at=active.started_at.isoformat(),
                              ended_at=ended_at.isoformat(),
                              minutes=minutes))
+
+@app.route('/clock-status')
+@login_required
+@couple_required
+def clock_status():
+    active = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
+    return jsonify(active=bool(active))
 
 @app.route('/log-date', methods=['GET', 'POST'])
 @login_required

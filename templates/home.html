@@ -9,7 +9,7 @@
         </article>
     {% endif %}
 
-    <article class="clock-card">
+    <article class="clock-card" data-active="{{ 'true' if active_session else 'false' }}">
         {% if active_session %}
             <p class="clock-label">Date in progress</p>
             <div class="timer" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</div>
@@ -41,4 +41,19 @@
             setInterval(updateTimer, 1000);
         </script>
     {% endif %}
+
+    <script>
+        const clockCard = document.querySelector('.clock-card');
+        const renderedActive = clockCard.dataset.active === 'true';
+
+        setInterval(async () => {
+            if (document.hidden) return;
+            try {
+                const res = await fetch("{{ url_for('clock_status') }}");
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.active !== renderedActive) window.location.reload();
+            } catch (e) {}
+        }, 4000);
+    </script>
 {% endblock %}
