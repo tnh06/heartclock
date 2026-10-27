@@ -75,6 +75,23 @@ def couple_required(f):
         return f(*args, **kwargs)
     return wrapper
 
+def parse_time_range(form):
+    s = form.get('started_at', '').strip()
+    e = form.get('ended_at', '').strip()
+    if not s or not e:
+        return None, None, None
+    try:
+        start = datetime.fromisoformat(s.replace('Z', ''))
+        end = datetime.fromisoformat(e.replace('Z', ''))
+    except ValueError:
+        flash("Couldn't read that time range, so it was left out.")
+        return None, None, None
+    minutes = round((end - start).total_seconds() / 60)
+    if minutes < 1 or minutes > 24 * 60:
+        flash("The time range has to be between 1 minute and 24 hours, so it was left out.")
+        return None, None, None
+    return start, end, minutes
+
 CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
 
 def generate_invite_code():
@@ -196,12 +213,16 @@ def logout():
 @couple_required
 def add_date():
     if request.method == 'POST':
+        start, end, minutes = parse_time_range(request.form)
         new_entry = DateEntry(
             couple_id=current_user.couple_id,
             author_id=current_user.id,
             title=request.form['title'],
             date=datetime.strptime(request.form['date'], '%Y-%m-%d').date(),
-            notes=request.form['notes']
+            notes=request.form['notes'],
+            started_at=start,
+            ended_at=end,
+            duration_minutes=minutes
         )
         db.session.add(new_entry)
         add_photos(new_entry, request.files.getlist('photos'))
@@ -223,6 +244,10 @@ def edit_date(entry_id):
         entry.title = request.form['title']
         entry.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         entry.notes = request.form['notes']
+
+        start, end, minutes = parse_time_range(request.form)
+        if start or entry.started_at:
+            entry.started_at, entry.ended_at, entry.duration_minutes = start, end, minutes
 
         remove_ids = {int(i) for i in request.form.getlist('remove_photo') if i.isdigit()}
         for p in list(entry.photos):

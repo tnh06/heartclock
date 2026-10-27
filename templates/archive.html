@@ -38,7 +38,7 @@
                 {% if entry.photos %}
                     <div class="photo-strip">
                         {% for p in entry.photos %}
-                            <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ entry.title }}" loading="lazy">
+                            <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ entry.title }}" loading="lazy" data-group="entry-{{ entry.id }}">
                         {% endfor %}
                     </div>
                 {% endif %}

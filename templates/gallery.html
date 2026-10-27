@@ -10,7 +10,7 @@
         <div class="gallery-grid">
             {% for p in photos %}
                 <a href="{{ url_for('serve_photo', filename=p.filename) }}" target="_blank">
-                    <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ p.entry.title }}" loading="lazy">
+                    <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="{{ p.entry.title }}" loading="lazy" data-group="gallery">
                 </a>
             {% endfor %}
         </div>
