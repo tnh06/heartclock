@@ -4,16 +4,21 @@
 {% block content %}
     <article class="auth-card">
         <h1>Add a date</h1>
+
         <form method="POST" enctype="multipart/form-data" autocomplete="off" id="date-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {# Filled in by time-range.js from the start and end time fields #}
             <input type="hidden" name="started_at">
             <input type="hidden" name="ended_at">
+
             <label>Title
                 <input type="text" name="title" autocomplete="off" required>
             </label>
+
             <label>Date
                 <input type="date" name="date" required>
             </label>
+
             <div class="time-row">
                 <label>Start time (optional)
                     <input type="time" name="start_time">
@@ -22,12 +27,15 @@
                     <input type="time" name="end_time">
                 </label>
             </div>
+
             <label>Notes
                 <textarea name="notes" rows="4"></textarea>
             </label>
+
             <label>Photos (optional, up to 10)
                 <input type="file" name="photos" accept="image/*" multiple>
             </label>
+
             <div class="form-actions">
                 <button type="submit">Save Date</button>
                 <a href="{{ url_for('archive') }}" role="button" class="outline secondary">Cancel</a>

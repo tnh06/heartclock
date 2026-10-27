@@ -4,16 +4,21 @@
 {% block content %}
     <article class="auth-card">
         <h1>Edit date</h1>
-        <form method="POST" enctype="multipart/form-data" id="date-form">
+
+        <form method="POST" enctype="multipart/form-data" autocomplete="off" id="date-form">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {# Saved times, which time-range.js shows in the time fields in local time #}
             <input type="hidden" name="started_at" value="{{ (entry.started_at.isoformat() ~ 'Z') if entry.started_at else '' }}">
             <input type="hidden" name="ended_at" value="{{ (entry.ended_at.isoformat() ~ 'Z') if entry.ended_at else '' }}">
+
             <label>Title
                 <input type="text" name="title" value="{{ entry.title }}" autocomplete="off" required>
             </label>
+
             <label>Date
                 <input type="date" name="date" value="{{ entry.date }}" required>
             </label>
+
             <div class="time-row">
                 <label>Start time (optional)
                     <input type="time" name="start_time">
@@ -22,20 +27,22 @@
                     <input type="time" name="end_time">
                 </label>
             </div>
+
             <label>Notes
                 <textarea name="notes" rows="4">{{ entry.notes or '' }}</textarea>
             </label>
 
             {% if entry.photos %}
                 <div class="photo-strip">
-                    {% for p in entry.photos %}
+                    {% for photo in entry.photos %}
                         <label class="photo-edit">
-                            <img src="{{ url_for('serve_photo', filename=p.filename) }}" alt="">
-                            <span><input type="checkbox" name="remove_photo" value="{{ p.id }}"> Remove</span>
+                            <img src="{{ url_for('serve_photo', filename=photo.filename) }}" alt="">
+                            <span><input type="checkbox" name="remove_photo" value="{{ photo.id }}"> Remove</span>
                         </label>
                     {% endfor %}
                 </div>
             {% endif %}
+
             <label>Add photos (up to 10 in total)
                 <input type="file" name="photos" accept="image/*" multiple>
             </label>
