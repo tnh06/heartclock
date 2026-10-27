@@ -64,6 +64,10 @@ h1, h2, h3 {
     color: var(--pico-muted-color);
 }
 
+.text-center {
+    text-align: center;
+}
+
 
 /* 3. Layout
    ========================================================================== */
@@ -176,6 +180,11 @@ h1, h2, h3 {
     margin: 0;
     padding: 0.35rem 0.9rem;
     font-size: 0.85rem;
+}
+
+.auth-card .button-block {
+    display: block;
+    margin-top: 1.5rem;
 }
 
 .danger-button {

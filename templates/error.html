@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}Heartclock - {{ code }}{% endblock %}
+{% block title %}Heartclock • {{ code }}{% endblock %}
 
 {% block content %}
-    <article class="auth-card" style="text-align:center">
+    <article class="auth-card text-center">
         <h1>{{ code }}</h1>
         <p class="muted">{{ message }}</p>
         <a href="{{ url_for('home') }}" role="button">Back to Heartclock</a>
