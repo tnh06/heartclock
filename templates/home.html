@@ -9,33 +9,43 @@
         </article>
     {% endif %}
 
-    <article class="clock-card" data-active="{{ 'true' if active_session else 'false' }}">
+    <section class="clock-stage" data-active="{{ 'true' if active_session else 'false' }}">
+        <p class="clock-label">{{ 'Date in progress' if active_session else 'Together right now?' }}</p>
+
+        <form method="POST" action="{{ url_for('clock_out' if active_session else 'clock_in') }}"
+              class="clock-ring {{ 'running' if active_session else '' }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="clock-button">
+                {% if active_session %}
+                    <span class="clock-time" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</span>
+                    <span class="clock-action">Clock out</span>
+                {% else %}
+                    <span class="clock-action">Clock in</span>
+                {% endif %}
+            </button>
+        </form>
+
         {% if active_session %}
-            <p class="clock-label">Date in progress</p>
-            <div class="timer" id="timer" data-start="{{ active_session.started_at.isoformat() }}Z">0:00:00</div>
-            <form method="POST" action="{{ url_for('clock_out') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Clock Out</button>
-            </form>
-        {% else %}
-            <p class="clock-label">Together right now?</p>
-            <form method="POST" action="{{ url_for('clock_in') }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Clock In</button>
-            </form>
+            <p class="clock-sub">Started <span class="local-time" data-utc="{{ active_session.started_at.isoformat() }}Z"></span></p>
         {% endif %}
-    </article>
+    </section>
 
     <script>
         (function () {
-            const card = document.querySelector('.clock-card');
-            const wasActive = card.dataset.active === 'true';
+            const stage = document.querySelector('.clock-stage');
+            const wasActive = stage.dataset.active === 'true';
+            const pad = n => String(n).padStart(2, '0');
+
+            // Show the start time in the viewer's own timezone
+            document.querySelectorAll('.local-time').forEach(el => {
+                const time = new Date(el.dataset.utc);
+                el.textContent = time.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+            });
 
             // Running timer, only present while a date is in progress
             const timerEl = document.getElementById('timer');
             if (timerEl) {
                 const start = new Date(timerEl.dataset.start);
-                const pad = n => String(n).padStart(2, '0');
 
                 function tick() {
                     const total = Math.max(0, Math.floor((new Date() - start) / 1000));

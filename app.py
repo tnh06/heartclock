@@ -272,9 +272,10 @@ def logout():
 @login_required
 @couple_required
 def home_page():
-    active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
-    couple = db.session.get(Couple, current_user.couple_id)
-    member_count = User.query.filter_by(couple_id=current_user.couple_id).count()
+    couple_id = current_user.couple_id
+    active_session = ActiveSession.query.filter_by(couple_id=couple_id).first()
+    couple = db.session.get(Couple, couple_id)
+    member_count = User.query.filter_by(couple_id=couple_id).count()
     return render_template('home.html', active_session=active_session,
                            couple=couple, member_count=member_count)
 

@@ -13,6 +13,7 @@
 /* 1. Theme
    ========================================================================== */
 
+
 :root {
     --narrow-width: 440px;
 }
@@ -282,84 +283,167 @@ h1, h2, h3 {
 
 /* Clock (home) */
 
-main:has(.clock-card) {
-    display: flex;
-    flex-direction: column;
-    justify-content: safe center;
-    min-height: calc(100vh - 10rem);
-}
-
-.clock-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1.25rem;
-    width: 90%;
-    max-width: 360px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    padding: 1.5rem 1rem;
-    overflow: hidden;
-    text-align: center;
-    background: linear-gradient(135deg, rgba(229, 80, 107, 0.18), rgba(120, 70, 200, 0.14));
-    border: 1px solid rgba(255, 122, 143, 0.25);
-}
-
-.clock-card form {
-    margin: 0;
-}
-
-.clock-label {
-    margin: 0;
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--pico-muted-color);
-}
-
-.timer {
-    width: 100%;
-    margin: 0;
-    padding: 0.5rem 1rem;
-    box-sizing: border-box;
-    font-family: 'Courier New', monospace;
-    font-size: clamp(2rem, 9vw, 2.75rem);
-    white-space: nowrap;
-    color: #ff4d6a;
-    text-shadow: 0 0 12px rgba(255, 77, 106, 0.6), 0 0 2px rgba(255, 77, 106, 0.8);
-    background: #1a0a0d;
-    border: 2px solid rgba(255, 77, 106, 0.3);
-    border-radius: 0.5rem;
-}
-
-.clock-card button {
-    display: block;
-    width: 100%;
-    max-width: 240px;
-    margin: 0 auto;
-    padding: 1.1rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    border-radius: 0.6rem;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.05s, box-shadow 0.05s;
-}
-
-.clock-card button:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
-}
-
 .invite-banner {
     border-left: 4px solid var(--pico-primary);
 }
 
 .invite-banner p {
     margin-bottom: 0.5rem;
+}
+
+/* Fill the screen exactly, so the page doesn't scroll, and let the clock center itself in the space left over */
+.page:has(.clock-stage) {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+}
+
+.page:has(.clock-stage) main {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.clock-stage {
+    margin: auto 0;
+    padding: 1.5rem 0;
+    text-align: center;
+    overflow-x: clip;
+}
+
+.clock-label {
+    margin: 0 0 1.25rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pico-muted-color);
+}
+
+.clock-sub {
+    margin: 1.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--pico-muted-color);
+}
+
+/* The form is the ring and the button sits inside it */
+.clock-ring {
+    --ring-width: 6px;
+    position: relative;
+    width: min(76vw, 300px);
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+}
+
+.clock-ring::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(rgba(255, 122, 143, 0.35), rgba(255, 122, 143, 0.35));
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - var(--ring-width)), #000 calc(100% - var(--ring-width) + 1px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - var(--ring-width)), #000 calc(100% - var(--ring-width) + 1px));
+}
+
+.clock-ring.running {
+    filter: drop-shadow(0 0 18px rgba(255, 77, 106, 0.35));
+}
+
+.clock-ring.running::before {
+    background: conic-gradient(rgba(255, 77, 106, 0), #ff4d6a);
+    animation: ring-spin 4s linear infinite;
+}
+
+@keyframes ring-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .clock-ring.running::before {
+        animation: none;
+    }
+}
+
+/* Idle: the ring slowly breathes while no date is running */
+@media (prefers-reduced-motion: no-preference) {
+    .clock-ring::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
+        pointer-events: none;
+        opacity: 0;
+    }
+
+    .clock-ring:not(.running)::before,
+    .clock-ring:not(.running)::after {
+        animation: idle-breathe 4s ease-in-out infinite;
+    }
+}
+
+@keyframes idle-breathe {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 1; }
+}
+
+.clock-ring .clock-button {
+    position: absolute;
+    inset: calc(var(--ring-width) + 8px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    color: #fff;
+    background: radial-gradient(circle at 30% 25%, #ff7a8f, #e5506b 60%, #c93d58);
+    box-shadow: 0 10px 30px rgba(229, 80, 107, 0.35);
+    cursor: pointer;
+    transition: transform 0.1s ease;
+}
+
+.clock-ring .clock-button:hover {
+    filter: brightness(1.06);
+}
+
+.clock-ring .clock-button:active {
+    transform: scale(0.97);
+}
+
+.clock-ring .clock-button:focus-visible {
+    outline: 3px solid var(--pico-primary-focus);
+    outline-offset: 4px;
+}
+
+.clock-ring.running .clock-button {
+    background: #1a0a0d;
+    border: 2px solid rgba(255, 77, 106, 0.3);
+    box-shadow: inset 0 0 30px rgba(255, 77, 106, 0.12);
+}
+
+.clock-action {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.clock-ring.running .clock-action {
+    font-size: 0.8rem;
+    color: var(--pico-primary);
+}
+
+.clock-time {
+    font-family: 'Courier New', monospace;
+    font-size: clamp(1.9rem, 9vw, 2.6rem);
+    line-height: 1;
+    color: #ff4d6a;
+    text-shadow: 0 0 12px rgba(255, 77, 106, 0.6), 0 0 2px rgba(255, 77, 106, 0.8);
 }
 
 /* Archive */
