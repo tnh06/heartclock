@@ -1,8 +1,30 @@
+/* ==========================================================================
+   Heartclock styles
+
+   1. Theme
+   2. Base
+   3. Layout (page, header, bottom navigation)
+   4. Components (headings, cards, buttons, forms, messages)
+   5. Pages (clock, archive, gallery)
+   6. Photo viewer
+   ========================================================================== */
+
+
+/* 1. Theme
+   ========================================================================== */
+
+:root {
+    --narrow-width: 440px;
+}
+
 :root[data-theme="dark"] {
+    /* Typography */
     --pico-font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    --pico-background-color: #120e18;
     --pico-color: #e9e4ef;
     --pico-muted-color: #9a91a8;
+
+    /* Background and accent */
+    --pico-background-color: #120e18;
     --pico-primary: #ff7a8f;
     --pico-primary-background: #e5506b;
     --pico-primary-hover: #ff9aa9;
@@ -10,14 +32,22 @@
     --pico-primary-underline: rgba(255, 122, 143, 0.5);
     --pico-primary-focus: rgba(255, 122, 143, 0.3);
     --pico-primary-inverse: #ffffff;
+
+    /* Cards */
     --pico-card-background-color: #1b1524;
     --pico-card-border-color: #2b2336;
     --pico-card-box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
     --pico-border-radius: 0.9rem;
+
+    /* Form fields */
     --pico-form-element-background-color: #150f1d;
     --pico-form-element-border-color: #33293f;
     --pico-form-element-focus-color: #ff7a8f;
 }
+
+
+/* 2. Base
+   ========================================================================== */
 
 body {
     background:
@@ -30,16 +60,29 @@ h1, h2, h3 {
     font-family: 'Fraunces', Georgia, serif;
 }
 
+.muted {
+    color: var(--pico-muted-color);
+}
+
+
+/* 3. Layout
+   ========================================================================== */
+
 .page {
     max-width: 720px;
     margin: 0 auto;
     padding: 0 1.25rem 4rem;
 }
 
+.page.has-bottom-nav {
+    padding-bottom: 5.5rem;
+}
+
 /* Header */
+
 .site-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
     padding: 1.5rem 0 1rem;
 }
@@ -51,231 +94,7 @@ h1, h2, h3 {
     text-decoration: none;
 }
 
-.nav-links {
-    display: flex;
-    gap: 1.25rem;
-}
-
-.nav-links a {
-    color: var(--pico-muted-color);
-    text-decoration: none;
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    color: var(--pico-color);
-}
-
-/* Shared bits */
-.muted {
-    color: var(--pico-muted-color);
-}
-
-.small {
-    width: auto;
-    margin: 0;
-    padding: 0.35rem 0.9rem;
-    font-size: 0.85rem;
-}
-
-.auth-card {
-    max-width: 440px;
-    margin: 2rem auto;
-}
-
-.auth-card h1 {
-    margin-bottom: 0.25rem;
-}
-
-/* Clock card */
-.clock-card {
-    text-align: center;
-    padding: 1.5rem 1rem;
-    background: linear-gradient(135deg, rgba(229, 80, 107, 0.18), rgba(120, 70, 200, 0.14));
-    border: 1px solid rgba(255, 122, 143, 0.25);
-    width: 90%;
-    max-width: 360px;
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1.25rem;
-    overflow: hidden;
-}
-
-.clock-label {
-    margin: 0;
-    color: var(--pico-muted-color);
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    white-space: nowrap;
-}
-
-.timer {
-    font-family: 'Courier New', monospace;
-    font-size: clamp(2rem, 9vw, 2.75rem);
-    margin: 0;
-    color: #ff4d6a;
-    text-shadow: 0 0 12px rgba(255, 77, 106, 0.6), 0 0 2px rgba(255, 77, 106, 0.8);
-    background: #1a0a0d;
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: 2px solid rgba(255, 77, 106, 0.3);
-    width: 100%;
-    box-sizing: border-box;
-    white-space: nowrap;
-}
-
-.clock-card form {
-    margin: 0;
-}
-
-
-.clock-card button {
-    display: block;
-    width: 100%;
-    max-width: 240px;
-    margin: 0 auto;
-    padding: 1.1rem;
-    font-size: 1.2rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    font-weight: 700;
-    border-radius: 0.6rem;
-    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.2);
-    transition: transform 0.05s, box-shadow 0.05s;
-}
-
-.clock-card button:active {
-    transform: translateY(4px);
-    box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .beat { animation: none; }
-}
-
-/* Invite banner */
-.invite-banner {
-    border-left: 4px solid var(--pico-primary);
-}
-
-.invite-banner p {
-    margin-bottom: 0.5rem;
-}
-
-.invite-code {
-    font-size: 1.4rem;
-    letter-spacing: 0.15em;
-    color: var(--pico-primary);
-    background: transparent;
-    padding: 0;
-}
-
-/* Timeline */
-.section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 2rem 0 1rem;
-    min-height: 2.5rem;
-}
-
-.section-head h2 {
-    margin: 0;
-    font-size: 1.5rem;
-}
-
-.date-card {
-    margin: 0 0 1rem;
-    padding: 1.25rem 1.5rem;
-}
-
-.date-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 1rem;
-}
-
-.date-card h3 {
-    margin: 0;
-    font-size: 1.25rem;
-}
-
-.meta {
-    margin: 0.25rem 0 0;
-    color: var(--pico-muted-color);
-    font-size: 0.9rem;
-}
-
-.notes {
-    margin: 0.9rem 0 0;
-    white-space: pre-line;
-}
-
-.pill {
-    background: rgba(255, 122, 143, 0.15);
-    color: var(--pico-primary);
-    padding: 0.15rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.actions form {
-    margin: 0;
-}
-
-.empty {
-    text-align: center;
-    padding: 2.5rem 1rem;
-    color: var(--pico-muted-color);
-}
-
-.site-header.centered {
-    justify-content: center;
-}
-
-.flashes {
-    list-style: none;
-    max-width: 440px;
-    margin: 1.5rem auto 0;
-    padding: 0;
-}
-
-.flashes li {
-    list-style: none;
-    background: rgba(255, 122, 143, 0.12);
-    border: 1px solid rgba(255, 122, 143, 0.35);
-    color: var(--pico-primary);
-    padding: 0.75rem 1rem;
-    border-radius: var(--pico-border-radius);
-    margin-bottom: 0.75rem;
-}
-
-.form-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
-}
-
-.form-actions button,
-.form-actions a[role="button"] {
-    flex: 1;
-    margin: 0;
-    text-align: center;
-}
+/* Bottom navigation */
 
 .bottom-nav {
     position: fixed;
@@ -303,15 +122,10 @@ h1, h2, h3 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
     gap: 0.2rem;
     color: var(--pico-muted-color);
     text-decoration: none;
-    flex: 1;
-}
-
-.bottom-nav a svg {
-    width: 20px;
-    height: 20px;
 }
 
 .bottom-nav a span {
@@ -325,11 +139,43 @@ h1, h2, h3 {
     color: var(--pico-primary);
 }
 
-.page-footer-action {
-    display: block !important;
-    max-width: 440px;
-    width: 100%;
-    margin: 1.5rem auto 0 !important;
+
+/* 4. Components
+   ========================================================================== */
+
+/* Page headings */
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 2.5rem;
+    margin: 2rem 0 1rem;
+}
+
+.section-head h2 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Cards */
+
+.auth-card {
+    max-width: var(--narrow-width);
+    margin: 2rem auto;
+}
+
+.auth-card h1 {
+    margin-bottom: 0.25rem;
+}
+
+/* Buttons */
+
+.small {
+    width: auto;
+    margin: 0;
+    padding: 0.35rem 0.9rem;
+    font-size: 0.85rem;
 }
 
 .danger-button {
@@ -343,94 +189,254 @@ h1, h2, h3 {
     --pico-background-color: #ff6b6b;
 }
 
-main:has(.clock-card) {
-    min-height: calc(100vh - 10rem);
+.page-footer-action {
+    display: block !important;
+    width: 100%;
+    max-width: var(--narrow-width);
+    margin: 1.5rem auto 0 !important;
+}
+
+/* Forms */
+
+.form-actions {
     display: flex;
-    flex-direction: column;
-    justify-content: safe center;
+    gap: 0.75rem;
+    margin-top: 1rem;
 }
 
-.photo-strip {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 0.5rem;
-    margin: 0.9rem 0;
+.form-actions button,
+.form-actions a[role="button"] {
+    flex: 1;
+    margin: 0;
+    text-align: center;
 }
 
-.photo-strip img {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 0.5rem;
-}
-
-.photo-edit span {
-    display: block;
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
-}
-
-/* Gallery */
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.25rem;
-}
-
-.gallery-grid a {
-    display: block;
-}
-
-.gallery-grid img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 0.4rem;
-}
-
-/* Photos inside archive cards and the edit page */
-.photo-strip {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.25rem;
-    margin: 0.9rem 0;
-}
-
-.photo-strip img {
-    display: block;
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    border-radius: 0.4rem;
-}
-
-.photo-edit span {
-    display: block;
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
-}
-
-/* Time fields on the date forms */
 .time-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
 }
 
-/* Photo viewer */
+/* Flash messages */
+
+.flashes {
+    list-style: none;
+    max-width: var(--narrow-width);
+    margin: 1.5rem auto 0;
+    padding: 0;
+}
+
+.flashes li {
+    list-style: none;
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: rgba(255, 122, 143, 0.12);
+    border: 1px solid rgba(255, 122, 143, 0.35);
+    border-radius: var(--pico-border-radius);
+    color: var(--pico-primary);
+}
+
+/* Empty state */
+
+.empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--pico-muted-color);
+}
+
+/* Invite code (home banner and settings) */
+
+.invite-code {
+    padding: 0;
+    background: transparent;
+    font-size: 1.4rem;
+    letter-spacing: 0.15em;
+    color: var(--pico-primary);
+}
+
+
+/* 5. Pages
+   ========================================================================== */
+
+/* Clock (home) */
+
+main:has(.clock-card) {
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    min-height: calc(100vh - 10rem);
+}
+
+.clock-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.25rem;
+    width: 90%;
+    max-width: 360px;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+    padding: 1.5rem 1rem;
+    overflow: hidden;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(229, 80, 107, 0.18), rgba(120, 70, 200, 0.14));
+    border: 1px solid rgba(255, 122, 143, 0.25);
+}
+
+.clock-card form {
+    margin: 0;
+}
+
+.clock-label {
+    margin: 0;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--pico-muted-color);
+}
+
+.timer {
+    width: 100%;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+    font-family: 'Courier New', monospace;
+    font-size: clamp(2rem, 9vw, 2.75rem);
+    white-space: nowrap;
+    color: #ff4d6a;
+    text-shadow: 0 0 12px rgba(255, 77, 106, 0.6), 0 0 2px rgba(255, 77, 106, 0.8);
+    background: #1a0a0d;
+    border: 2px solid rgba(255, 77, 106, 0.3);
+    border-radius: 0.5rem;
+}
+
+.clock-card button {
+    display: block;
+    width: 100%;
+    max-width: 240px;
+    margin: 0 auto;
+    padding: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 0.6rem;
+    box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.05s, box-shadow 0.05s;
+}
+
+.clock-card button:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
+}
+
+.invite-banner {
+    border-left: 4px solid var(--pico-primary);
+}
+
+.invite-banner p {
+    margin-bottom: 0.5rem;
+}
+
+/* Archive */
+
+.date-card {
+    margin: 0 0 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.date-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+}
+
+.date-card h3 {
+    margin: 0;
+    font-size: 1.25rem;
+}
+
+.pill {
+    padding: 0.15rem 0.65rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--pico-primary);
+    background: rgba(255, 122, 143, 0.15);
+    border-radius: 999px;
+}
+
+.meta {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: var(--pico-muted-color);
+}
+
+.notes {
+    margin: 0.9rem 0 0;
+    white-space: pre-line;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.actions form {
+    margin: 0;
+}
+
+/* Photos (gallery, archive cards, edit page) */
+
+.gallery-grid,
+.photo-strip {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+}
+
+.photo-strip {
+    margin: 0.9rem 0;
+}
+
+.gallery-grid a {
+    display: block;
+}
+
 .gallery-grid img,
 .photo-strip img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 0.4rem;
+}
+
+img[data-group] {
     cursor: pointer;
 }
+
+.photo-edit span {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+}
+
+
+/* 6. Photo viewer
+   ========================================================================== */
 
 .viewer {
     position: fixed;
     inset: 0;
-    background: rgba(8, 5, 12, 0.95);
     display: flex;
     align-items: center;
     justify-content: center;
+    background: rgba(8, 5, 12, 0.95);
     z-index: 100;
 }
 
@@ -439,28 +445,28 @@ main:has(.clock-card) {
 }
 
 .viewer-img {
-    max-width: 100vw;
-    max-height: 100vh;
     width: auto;
     height: auto;
+    max-width: 100vw;
+    max-height: 100vh;
     object-fit: contain;
 }
 
 .viewer button {
     position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 2.75rem;
     height: 2.75rem;
     margin: 0;
     padding: 0;
     border: none;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.14);
-    color: #fff;
     font-size: 1.75rem;
     line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.14);
 }
 
 .viewer-close {
@@ -468,16 +474,18 @@ main:has(.clock-card) {
     right: 1rem;
 }
 
-.viewer-prev {
-    left: 0.75rem;
+.viewer-prev,
+.viewer-next {
     top: 50%;
     transform: translateY(-50%);
 }
 
+.viewer-prev {
+    left: 0.75rem;
+}
+
 .viewer-next {
     right: 0.75rem;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 .viewer-count {
@@ -486,8 +494,8 @@ main:has(.clock-card) {
     left: 0;
     right: 0;
     text-align: center;
-    color: rgba(255, 255, 255, 0.8);
     font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
 }
 
 .viewer.single .viewer-prev,
