@@ -217,6 +217,19 @@ h1, h2, h3 {
     gap: 0.75rem;
 }
 
+.stack-gap {
+    margin-top: 1rem;
+}
+
+.stack-gap-sm {
+    margin-top: 0.75rem;
+}
+
+.code-input {
+    margin-top: 1rem;
+    text-transform: uppercase;
+}
+
 /* Flash messages */
 
 .flashes {
