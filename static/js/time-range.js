@@ -1,46 +1,60 @@
+/*
+ * Optional start and end times on the add and edit date forms.
+ *
+ * The visible time boxes are in the person's own timezone. On submit they are
+ * converted to UTC timestamps and put in the hidden started_at and ended_at
+ * fields, which is what the server stores.
+ */
 (function () {
     const form = document.getElementById('date-form');
     if (!form) return;
 
-    const dateEl = form.elements['date'];
-    const startEl = form.elements['start_time'];
-    const endEl = form.elements['end_time'];
+    const dateInput = form.elements['date'];
+    const startInput = form.elements['start_time'];
+    const endInput = form.elements['end_time'];
     const startedAt = form.elements['started_at'];
     const endedAt = form.elements['ended_at'];
 
+    const DAY_MS = 24 * 60 * 60 * 1000;
     const pad = n => String(n).padStart(2, '0');
-    const hhmm = d => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const toTimeValue = date => `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    const snapshot = () => [dateInput.value, startInput.value, endInput.value].join('|');
 
-    // Edit page: fill the time inputs from the stored UTC times
+    // Edit page: show the saved UTC times as local times
     if (startedAt.value && endedAt.value) {
-        startEl.value = hhmm(new Date(startedAt.value));
-        endEl.value = hhmm(new Date(endedAt.value));
+        startInput.value = toTimeValue(new Date(startedAt.value));
+        endInput.value = toTimeValue(new Date(endedAt.value));
     }
 
-    const initial = [dateEl.value, startEl.value, endEl.value].join('|');
+    const initial = snapshot();
 
     // If one time is filled in, the other becomes required
-    function sync() {
-        const either = startEl.value || endEl.value;
-        startEl.required = endEl.required = Boolean(either);
+    function updateRequired() {
+        const eitherFilled = Boolean(startInput.value || endInput.value);
+        startInput.required = eitherFilled;
+        endInput.required = eitherFilled;
     }
-    startEl.addEventListener('input', sync);
-    endEl.addEventListener('input', sync);
-    sync();
+
+    startInput.addEventListener('input', updateRequired);
+    endInput.addEventListener('input', updateRequired);
+    updateRequired();
 
     form.addEventListener('submit', () => {
-        const current = [dateEl.value, startEl.value, endEl.value].join('|');
-        if (current === initial) return; // nothing changed, keep the stored values
+        // Nothing changed, so keep the saved values exactly as they are
+        if (snapshot() === initial) return;
 
-        if (!startEl.value || !endEl.value) {
+        if (!startInput.value || !endInput.value) {
             startedAt.value = '';
             endedAt.value = '';
             return;
         }
 
-        const start = new Date(`${dateEl.value}T${startEl.value}`);
-        let end = new Date(`${dateEl.value}T${endEl.value}`);
-        if (end <= start) end = new Date(end.getTime() + 24 * 60 * 60 * 1000); // ran past midnight
+        const start = new Date(`${dateInput.value}T${startInput.value}`);
+        let end = new Date(`${dateInput.value}T${endInput.value}`);
+
+        // An end time earlier than the start means the date ran past midnight
+        if (end <= start) end = new Date(end.getTime() + DAY_MS);
+
         startedAt.value = start.toISOString();
         endedAt.value = end.toISOString();
     });
