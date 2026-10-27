@@ -13,7 +13,7 @@ from flask_wtf.csrf import CSRFError, CSRFProtect
 from PIL import Image, ImageOps
 from sqlalchemy import func
 
-from models import ActiveSession, Couple, DateEntry, Photo, User, db
+from models import ActiveSession, Couple, DateEntry, Photo, User, db, utc_now
 
 
 # ---------------------------------------------------------------------------
@@ -50,11 +50,6 @@ CODE_LENGTH = 6
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
-
-def utc_now():
-    """Current UTC time as a naive datetime, which is how times are stored."""
-    return datetime.now(timezone.utc).replace(tzinfo=None)
-
 
 def parse_time_range(form):
     """Read the optional start and end times from a form.
