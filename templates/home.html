@@ -2,13 +2,6 @@
 {% block title %}Heartclock{% endblock %}
 
 {% block content %}
-    {% if member_count < 2 %}
-        <article class="invite-banner">
-            <p>Your partner hasn't joined yet. Send them this invite code to enter at signup:</p>
-            <code class="invite-code">{{ couple.invite_code }}</code>
-        </article>
-    {% endif %}
-
     <section class="clock-stage" data-active="{{ 'true' if active_session else 'false' }}">
         <p class="clock-label">{{ 'Date in progress' if active_session else 'Together right now?' }}</p>
 

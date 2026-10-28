@@ -134,6 +134,7 @@ h1, h2, h3 {
 }
 
 .bottom-nav a span {
+    position: relative;
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: 0.03em;
@@ -142,6 +143,17 @@ h1, h2, h3 {
 
 .bottom-nav a.active {
     color: var(--pico-primary);
+}
+
+.nav-dot {
+    position: absolute;
+    top: -2px;
+    right: -10px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pico-primary);
+    box-shadow: 0 0 0 2px var(--pico-card-background-color);
 }
 
 
@@ -283,12 +295,46 @@ h1, h2, h3 {
 
 /* Clock (home) */
 
-.invite-banner {
-    border-left: 4px solid var(--pico-primary);
+/* Invite code reminder, shown at the bottom until your partner joins */
+.invite-hint {
+    padding-bottom: 1rem;
+    text-align: center;
 }
 
-.invite-banner p {
-    margin-bottom: 0.5rem;
+.invite-hint p {
+    margin: 0 0 0.5rem;
+    font-size: 0.85rem;
+    color: var(--pico-muted-color);
+}
+
+.invite-hint .invite-copy {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: auto;
+    margin: 0;
+    padding: 0.5rem 1.1rem;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--pico-primary);
+    background: transparent;
+    border: 1px dashed rgba(255, 122, 143, 0.45);
+    border-radius: 999px;
+}
+
+.invite-hint .invite-copy:hover {
+    border-style: solid;
+}
+
+.invite-copy small {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pico-muted-color);
 }
 
 /* Fill the screen exactly, so the page doesn't scroll, and let the clock center itself in the space left over */

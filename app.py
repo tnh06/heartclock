@@ -180,6 +180,16 @@ def get_own_entry(entry_id):
         abort(403)
     return entry
 
+@app.context_processor
+def nav_state():
+    """Lets every page know whether to show the dot on the Settings tab."""
+    if not current_user.is_authenticated:
+        return {'needs_partner': False}
+    if not current_user.couple_id:
+        return {'needs_partner': True}
+    members = User.query.filter_by(couple_id=current_user.couple_id).count()
+    return {'needs_partner': members < MAX_COUPLE_MEMBERS}
+
 
 # ---------------------------------------------------------------------------
 # Landing page and accounts
