@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Heartclock • Log Date{% endblock %}
+{% block title %}Heartclock • Log date{% endblock %}
 
 {% block content %}
     {% set mins = minutes|int %}
@@ -31,7 +31,7 @@
             </label>
 
             <div class="form-actions">
-                <button type="submit">Save Date</button>
+                <button type="submit">Save date</button>
                 <a href="{{ url_for('home_page') }}" role="button" class="outline secondary">Discard</a>
             </div>
         </form>

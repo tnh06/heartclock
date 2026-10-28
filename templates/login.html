@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Heartclock • Log In{% endblock %}
+{% block title %}Heartclock • Log in{% endblock %}
 
 {% block content %}
     <article class="auth-card">
@@ -10,7 +10,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="email" name="email" placeholder="Email" autocomplete="username" required>
             <input type="password" name="password" placeholder="Password" autocomplete="current-password" required>
-            <button type="submit">Log In</button>
+            <button type="submit">Log in</button>
         </form>
 
         <p class="muted">New here? <a href="{{ url_for('signup') }}">Sign up</a></p>

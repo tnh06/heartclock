@@ -220,17 +220,6 @@ h1, h2, h3 {
     line-height: 1.5rem;
 }
 
-.danger-button {
-    --pico-color: #ff6b6b;
-    --pico-border-color: #ff6b6b;
-    --pico-background-color: transparent;
-}
-
-.danger-button:hover {
-    --pico-color: #ffffff;
-    --pico-background-color: #ff6b6b;
-}
-
 .page-footer-action {
     display: block !important;
     width: 100%;
@@ -275,6 +264,47 @@ h1, h2, h3 {
 .code-input {
     margin-top: var(--space-md);
     text-transform: uppercase;
+}
+
+/* Account card on Settings: three collapsible sections with even spacing */
+
+.account-card {
+    /* One color for every section title, instead of changing with focus or open state */
+    --pico-accordion-close-summary-color: var(--pico-color);
+    --pico-accordion-open-summary-color: var(--pico-color);
+    --pico-accordion-active-summary-color: var(--pico-color);
+}
+
+.account-card h2 {
+    margin-bottom: var(--space-md);
+}
+
+.account-card details {
+    margin: 0;
+    padding: var(--space-md) 0;
+    border-top: 1px solid var(--pico-card-border-color);
+    border-bottom: none;
+}
+
+.account-card details:last-of-type {
+    padding-bottom: 0;
+}
+
+.account-card summary {
+    font-weight: 600;
+}
+
+.account-card details .muted {
+    margin: 0 0 var(--space-md);
+    font-size: 0.9rem;
+}
+
+.account-card details form {
+    margin: 0;
+}
+
+.account-card details form > :last-child {
+    margin-bottom: 0;
 }
 
 /* Flash messages */

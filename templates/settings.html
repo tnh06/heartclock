@@ -9,7 +9,7 @@
         <form method="POST" action="{{ url_for('update_name') }}">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="text" name="display_name" value="{{ current_user.display_name }}" maxlength="50" required>
-            <button type="submit">Save Name</button>
+            <button type="submit">Save name</button>
         </form>
     </article>
 
@@ -30,8 +30,8 @@
             {% endif %}
             <form method="POST" action="{{ url_for('leave_relationship') }}" class="stack-gap">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="outline danger-button"
-                        onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave Relationship</button>
+                <button type="submit"
+                        onclick="return confirm('Leave this relationship? Your partner will keep the shared dates, but you will lose access to them.')">Leave relationship</button>
             </form>
         </article>
     {% else %}
@@ -45,28 +45,29 @@
             </form>
             <form method="POST" action="{{ url_for('new_code') }}" class="stack-gap-sm">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit" class="outline secondary">Start a New Relationship</button>
+                <button type="submit">Start a new relationship</button>
             </form>
         </article>
     {% endif %}
 
     {# Account #}
-    <article class="auth-card">
+    <article class="auth-card account-card">
         <h2>Account</h2>
 
-        <details>
+        <details name="account">
             <summary>Change email</summary>
             <p class="muted">Current: {{ current_user.email }}</p>
             <form method="POST" action="{{ url_for('change_email') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="email" name="email" placeholder="New email" required>
                 <input type="password" name="password" placeholder="Current password" autocomplete="current-password" required>
-                <button type="submit">Update Email</button>
+                <button type="submit">Update email</button>
             </form>
         </details>
 
-        <details>
+        <details name="account">
             <summary>Change password</summary>
+            <p class="muted">At least 14 characters, with an uppercase letter, a lowercase letter and a number.</p>
             <form method="POST" action="{{ url_for('change_password') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="password" name="current_password" placeholder="Current password" autocomplete="current-password" required>
@@ -74,20 +75,19 @@
                        minlength="14" maxlength="72"
                        pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{14,72}"
                        title="At least 14 characters, with an uppercase letter, a lowercase letter and a number" required>
-                <small class="muted">At least 14 characters, with an uppercase letter, a lowercase letter and a number.</small>
-                <input type="password" name="confirm_password" placeholder="Confirm new password" autocomplete="new-password" class="stack-gap" required>
-                <button type="submit">Update Password</button>
+                <input type="password" name="confirm_password" placeholder="Confirm new password" autocomplete="new-password" required>
+                <button type="submit">Update password</button>
             </form>
         </details>
 
-        <details>
+        <details name="account">
             <summary>Delete account</summary>
             <p class="muted">This can't be undone. If you're the last person in your relationship, all of its dates and photos are deleted too.</p>
             <form method="POST" action="{{ url_for('delete_account') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="password" name="password" placeholder="Current password" autocomplete="current-password" required>
-                <button type="submit" class="outline danger-button"
-                        onclick="return confirm('Delete your account permanently?')">Delete Account</button>
+                <button type="submit"
+                        onclick="return confirm('Delete your account permanently?')">Delete account</button>
             </form>
         </details>
     </article>
@@ -95,6 +95,6 @@
     {# Log out #}
     <form method="POST" action="{{ url_for('logout') }}" class="page-footer-action">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit" class="outline secondary">Log out</button>
+        <button type="submit">Log out</button>
     </form>
 {% endblock %}
