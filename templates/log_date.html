@@ -26,13 +26,13 @@
                 <textarea name="notes" rows="4"></textarea>
             </label>
 
-            <label>Photos (optional, up to 10)
+            <label>Photos (optional, up to {{ max_photos }})
                 <input type="file" name="photos" accept="image/*" multiple>
             </label>
 
             <div class="form-actions">
                 <button type="submit">Save date</button>
-                <a href="{{ url_for('home_page') }}" role="button" class="outline secondary">Discard</a>
+                <a href="{{ url_for('clock') }}" role="button" class="outline secondary">Discard</a>
             </div>
         </form>
     </article>

@@ -1,7 +1,7 @@
 import os
 import secrets
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from functools import wraps
 
 from flask import (Flask, abort, flash, jsonify, redirect, render_template,
@@ -51,8 +51,10 @@ CODE_LENGTH = 6
 # Helpers
 # ---------------------------------------------------------------------------
 
+# Times
+
 def parse_time_range(form):
-    """Read the optional start and end times from a form.
+    """Read the optional start and end times from the add and edit forms.
     Returns (start, end, minutes), or (None, None, None) if missing or invalid."""
     start_text = form.get('started_at', '').strip()
     end_text = form.get('ended_at', '').strip()
@@ -70,6 +72,21 @@ def parse_time_range(form):
     if minutes < 1 or minutes > MAX_DURATION_MINUTES:
         flash("The time range has to be between 1 minute and 24 hours, so it was left out.")
         return None, None, None
+    return start, end, minutes
+
+
+def parse_clocked_time(values):
+    """Read the start, end and length of a clocked date from the address or a form.
+    Returns (start, end, minutes), or None if anything is missing or invalid."""
+    try:
+        start = datetime.fromisoformat(values['started_at'].replace('Z', ''))
+        end = datetime.fromisoformat(values['ended_at'].replace('Z', ''))
+        minutes = int(values['minutes'])
+    except (KeyError, AttributeError, TypeError, ValueError):
+        return None
+
+    if minutes < 1 or end < start:
+        return None
     return start, end, minutes
 
 
@@ -135,7 +152,16 @@ def couple_is_full(couple):
     return User.query.filter_by(couple_id=couple.id).count() >= MAX_COUPLE_MEMBERS
 
 
-# Passwords
+# Emails and passwords
+
+def normalize_email(email):
+    return email.strip().lower()
+
+
+def find_user_by_email(email):
+    """Look an account up by email, ignoring capital letters."""
+    return User.query.filter(func.lower(User.email) == normalize_email(email)).first()
+
 
 def password_error(password):
     """Returns a message describing the first rule the password breaks, or None."""
@@ -180,15 +206,18 @@ def get_own_entry(entry_id):
         abort(403)
     return entry
 
+
 @app.context_processor
-def nav_state():
-    """Lets every page know whether to show the dot on the Settings tab."""
-    if not current_user.is_authenticated:
-        return {'needs_partner': False}
-    if not current_user.couple_id:
-        return {'needs_partner': True}
-    members = User.query.filter_by(couple_id=current_user.couple_id).count()
-    return {'needs_partner': members < MAX_COUPLE_MEMBERS}
+def template_values():
+    """Values every template can use: the photo limit, and whether to show the dot on the Settings tab."""
+    values = {'max_photos': MAX_PHOTOS, 'needs_partner': False}
+    if current_user.is_authenticated:
+        if not current_user.couple_id:
+            values['needs_partner'] = True
+        else:
+            members = User.query.filter_by(couple_id=current_user.couple_id).count()
+            values['needs_partner'] = members < MAX_COUPLE_MEMBERS
+    return values
 
 
 # ---------------------------------------------------------------------------
@@ -201,16 +230,16 @@ def load_user(user_id):
 
 
 @app.route('/')
-def home():
+def index():
     if current_user.is_authenticated:
-        return redirect(url_for('home_page'))
+        return redirect(url_for('clock'))
     return render_template('landing.html')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        email = request.form['email']
+        email = normalize_email(request.form['email'])
         password = request.form['password']
         invite_code = request.form.get('invite_code', '').strip()
         display_name = request.form['display_name'].strip()
@@ -220,7 +249,7 @@ def signup():
             flash(error)
             return redirect(url_for('signup'))
 
-        if User.query.filter_by(email=email).first():
+        if find_user_by_email(email):
             flash("That email is already registered.")
             return redirect(url_for('signup'))
 
@@ -247,7 +276,7 @@ def signup():
         db.session.commit()
 
         login_user(user)
-        return redirect(url_for('home_page'))
+        return redirect(url_for('clock'))
 
     return render_template('signup.html')
 
@@ -255,11 +284,11 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = User.query.filter_by(email=request.form['email']).first()
+        user = find_user_by_email(request.form['email'])
 
         if user and bcrypt.check_password_hash(user.password_hash, request.form['password']):
             login_user(user)
-            return redirect(url_for('home_page'))
+            return redirect(url_for('clock'))
 
         flash("Invalid email or password.")
         return redirect(url_for('login'))
@@ -278,16 +307,12 @@ def logout():
 # Clock
 # ---------------------------------------------------------------------------
 
-@app.route('/home')
+@app.route('/clock')
 @login_required
 @couple_required
-def home_page():
-    couple_id = current_user.couple_id
-    active_session = ActiveSession.query.filter_by(couple_id=couple_id).first()
-    couple = db.session.get(Couple, couple_id)
-    member_count = User.query.filter_by(couple_id=couple_id).count()
-    return render_template('home.html', active_session=active_session,
-                           couple=couple, member_count=member_count)
+def clock():
+    active_session = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
+    return render_template('home.html', active_session=active_session)
 
 
 @app.route('/clock-in', methods=['POST'])
@@ -298,7 +323,7 @@ def clock_in():
     if not existing:
         db.session.add(ActiveSession(couple_id=current_user.couple_id))
         db.session.commit()
-    return redirect(url_for('home_page'))
+    return redirect(url_for('clock'))
 
 
 @app.route('/clock-out', methods=['POST'])
@@ -307,7 +332,7 @@ def clock_in():
 def clock_out():
     active = ActiveSession.query.filter_by(couple_id=current_user.couple_id).first()
     if not active:
-        return redirect(url_for('home_page'))
+        return redirect(url_for('clock'))
 
     started_at = active.started_at
     ended_at = utc_now()
@@ -334,6 +359,13 @@ def clock_status():
 @login_required
 @couple_required
 def log_date():
+    # This page only makes sense right after clocking out, so check the details are really there
+    clocked = parse_clocked_time(request.form if request.method == 'POST' else request.args)
+    if clocked is None:
+        flash("There's no date to save. Clock in and out to start one.")
+        return redirect(url_for('clock'))
+    start, end, minutes = clocked
+
     if request.method == 'POST':
         try:
             entry_date = datetime.strptime(request.form.get('local_date', ''), '%Y-%m-%d').date()
@@ -346,9 +378,9 @@ def log_date():
             title=request.form['title'],
             date=entry_date,
             notes=request.form['notes'],
-            duration_minutes=int(request.form['minutes']),
-            started_at=datetime.fromisoformat(request.form['started_at']),
-            ended_at=datetime.fromisoformat(request.form['ended_at']),
+            duration_minutes=minutes,
+            started_at=start,
+            ended_at=end,
         )
         db.session.add(entry)
         add_photos(entry, request.files.getlist('photos'))
@@ -356,9 +388,9 @@ def log_date():
         return redirect(url_for('archive'))
 
     return render_template('log_date.html',
-                           started_at=request.args.get('started_at'),
-                           ended_at=request.args.get('ended_at'),
-                           minutes=request.args.get('minutes'))
+                           started_at=start.isoformat(),
+                           ended_at=end.isoformat(),
+                           minutes=minutes)
 
 
 # ---------------------------------------------------------------------------
@@ -512,6 +544,10 @@ def leave_relationship():
 @app.route('/settings/join', methods=['POST'])
 @login_required
 def join_relationship():
+    if current_user.couple_id:
+        flash("Leave your current relationship before joining another.")
+        return redirect(url_for('settings'))
+
     couple = find_couple(request.form.get('invite_code', ''))
     if not couple:
         flash("Invalid invite code.")
@@ -527,6 +563,10 @@ def join_relationship():
 @app.route('/settings/new-code', methods=['POST'])
 @login_required
 def new_code():
+    if current_user.couple_id:
+        flash("Leave your current relationship before starting a new one.")
+        return redirect(url_for('settings'))
+
     couple = Couple(invite_code=generate_invite_code())
     db.session.add(couple)
     db.session.flush()
@@ -538,11 +578,12 @@ def new_code():
 @app.route('/settings/change-email', methods=['POST'])
 @login_required
 def change_email():
-    new_email = request.form['email'].strip()
+    new_email = normalize_email(request.form['email'])
+    existing = find_user_by_email(new_email)
 
     if not password_matches(request.form['password']):
         flash("Incorrect password.")
-    elif User.query.filter(User.email == new_email, User.id != current_user.id).first():
+    elif existing and existing.id != current_user.id:
         flash("That email is already in use.")
     else:
         current_user.email = new_email
@@ -620,7 +661,7 @@ def not_found(e):
 @app.errorhandler(413)
 def too_large(e):
     flash("That upload is too large. The limit is 100 MB per save.")
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or url_for('index'))
 
 
 @app.errorhandler(500)
@@ -632,7 +673,7 @@ def server_error(e):
 @app.errorhandler(CSRFError)
 def csrf_error(e):
     flash("Your session expired. Please try again.")
-    return redirect(request.referrer or url_for('home'))
+    return redirect(request.referrer or url_for('index'))
 
 
 # ---------------------------------------------------------------------------

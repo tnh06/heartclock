@@ -23,7 +23,7 @@
     <div class="page {% if current_user.is_authenticated %}has-bottom-nav{% endif %}">
         <header class="site-header">
             <a class="brand"
-                href="{{ url_for('home_page') if current_user.is_authenticated else url_for('login') }}">Heartclock</a>
+                href="{{ url_for('clock') if current_user.is_authenticated else url_for('login') }}">Heartclock</a>
         </header>
 
         <main>
@@ -42,7 +42,7 @@
     </div>
 
     {% if current_user.is_authenticated %}
-    {% set tabs = [('home_page', 'Clock'), ('archive', 'Archive'), ('gallery', 'Gallery'), ('settings', 'Settings')] %}
+    {% set tabs = [('clock', 'Clock'), ('archive', 'Archive'), ('gallery', 'Gallery'), ('settings', 'Settings')] %}
     <nav class="bottom-nav" aria-label="Main navigation">
         <div class="bottom-nav-inner">
             {% for endpoint, label in tabs %}
