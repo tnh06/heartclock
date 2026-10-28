@@ -359,6 +359,30 @@ h1, h2, h3 {
     margin: 0;
 }
 
+/* Landing page */
+.landing-card {
+    text-align: center;
+}
+
+.landing-card h1 {
+    margin-bottom: var(--space-md);
+}
+
+.landing-card .landing-text {
+    margin: 0 0 var(--space-lg);
+    color: var(--pico-muted-color);
+}
+
+.landing-card .landing-button {
+    display: block;
+    margin: 0;
+}
+
+.landing-card .landing-login {
+    margin: var(--space-lg) 0 0;
+    color: var(--pico-muted-color);
+}
+
 /* Invite code (Settings) */
 
 .invite-code {
