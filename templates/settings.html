@@ -15,7 +15,7 @@
 
     {# Relationship #}
     {% if couple %}
-        <article class="auth-card">
+        <article class="auth-card{% if needs_partner %} invite-pending{% endif %}">
             <h2>Invite code</h2>
             <p class="muted">Share this with your partner so they can join you.</p>
             <code class="invite-code">{{ couple.invite_code }}</code>

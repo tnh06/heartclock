@@ -289,6 +289,27 @@ h1, h2, h3 {
     color: var(--pico-primary);
 }
 
+/* Invite code card while waiting for a partner, with the same breathing glow as the idle clock ring */
+.invite-pending {
+    position: relative;
+}
+
+.invite-pending::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .invite-pending::after {
+        animation: idle-breathe 4s ease-in-out infinite;
+    }
+}
+
 
 /* 5. Pages
    ========================================================================== */
