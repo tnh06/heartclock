@@ -1,21 +1,40 @@
 /* ==========================================================================
    Heartclock styles
 
-   1. Theme
+   1. Design tokens and theme
    2. Base
    3. Layout (page, header, bottom navigation)
    4. Components (headings, cards, buttons, forms, messages)
-   5. Pages (clock, archive, gallery)
+   5. Pages (clock, archive, photos)
    6. Photo viewer
+
+   Every size follows an 8px grid. Spacing, corner radii and widths come from
+   the tokens below, so changing a token updates the whole app.
    ========================================================================== */
 
 
-/* 1. Theme
+/* 1. Design tokens and theme
    ========================================================================== */
-
 
 :root {
-    --narrow-width: 440px;
+    /* Spacing scale: multiples of 8px, plus a 4px half step */
+    --space-xs: 0.25rem;    /*  4px */
+    --space-sm: 0.5rem;     /*  8px */
+    --space-md: 1rem;       /* 16px */
+    --space-lg: 1.5rem;     /* 24px */
+    --space-xl: 2rem;       /* 32px */
+    --space-2xl: 3rem;      /* 48px */
+
+    /* Corner radii */
+    --radius-sm: 0.5rem;    /*  8px */
+    --radius-md: 1rem;      /* 16px */
+    --radius-full: 999px;
+
+    /* Sizes */
+    --content-width: 448px; /* the one column everything lines up to */
+    --ring-size: 320px;
+    --nav-height: 4rem;     /* 64px */
+    --card-gap: var(--space-lg);
 }
 
 :root[data-theme="dark"] {
@@ -34,16 +53,19 @@
     --pico-primary-focus: rgba(255, 122, 143, 0.3);
     --pico-primary-inverse: #ffffff;
 
-    /* Cards */
+    /* Cards: the same padding and corners on every card */
     --pico-card-background-color: #1b1524;
     --pico-card-border-color: #2b2336;
     --pico-card-box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-    --pico-border-radius: 0.9rem;
+    --pico-border-radius: var(--radius-md);
+    --pico-block-spacing-vertical: var(--space-lg);
+    --pico-block-spacing-horizontal: var(--space-lg);
 
-    /* Form fields */
+    /* Form fields: padding chosen so every field and button is exactly 48px tall */
     --pico-form-element-background-color: #150f1d;
     --pico-form-element-border-color: #33293f;
     --pico-form-element-focus-color: #ff7a8f;
+    --pico-form-element-spacing-vertical: calc(0.75rem - var(--pico-border-width));
 }
 
 
@@ -74,13 +96,13 @@ h1, h2, h3 {
    ========================================================================== */
 
 .page {
-    max-width: 720px;
+    max-width: calc(var(--content-width) + var(--space-lg) * 2);
     margin: 0 auto;
-    padding: 0 1.25rem 4rem;
+    padding: 0 var(--space-lg) var(--space-xl);
 }
 
 .page.has-bottom-nav {
-    padding-bottom: 5.5rem;
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-lg));
 }
 
 /* Header */
@@ -89,7 +111,7 @@ h1, h2, h3 {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1.5rem 0 1rem;
+    padding: var(--space-lg) 0 var(--space-md);
 }
 
 .brand {
@@ -117,18 +139,19 @@ h1, h2, h3 {
 .bottom-nav-inner {
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
-    max-width: 720px;
-    padding: 0.5rem 1.25rem;
+    max-width: calc(var(--content-width) + var(--space-lg) * 2);
+    height: var(--nav-height);
+    padding: 0 var(--space-lg);
 }
 
 .bottom-nav a {
     display: flex;
+    flex: 1;
     flex-direction: column;
     align-items: center;
-    flex: 1;
-    gap: 0.2rem;
+    justify-content: center;
     color: var(--pico-muted-color);
     text-decoration: none;
 }
@@ -145,12 +168,13 @@ h1, h2, h3 {
     color: var(--pico-primary);
 }
 
+/* Dot on the Settings tab while your partner hasn't joined */
 .nav-dot {
     position: absolute;
-    top: -2px;
-    right: -10px;
-    width: 8px;
-    height: 8px;
+    top: calc(var(--space-xs) * -1);
+    right: calc(var(--space-md) * -1);
+    width: var(--space-sm);
+    height: var(--space-sm);
     border-radius: 50%;
     background: var(--pico-primary);
     box-shadow: 0 0 0 2px var(--pico-card-background-color);
@@ -166,8 +190,8 @@ h1, h2, h3 {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    min-height: 2.5rem;
-    margin: 2rem 0 1rem;
+    min-height: var(--space-2xl);
+    margin: var(--space-lg) 0 var(--space-md);
 }
 
 .section-head h2 {
@@ -178,12 +202,12 @@ h1, h2, h3 {
 /* Cards */
 
 .auth-card {
-    max-width: var(--narrow-width);
-    margin: 2rem auto;
+    max-width: var(--content-width);
+    margin: var(--card-gap) auto;
 }
 
 .auth-card h1 {
-    margin-bottom: 0.25rem;
+    margin-bottom: var(--space-xs);
 }
 
 /* Buttons */
@@ -191,13 +215,9 @@ h1, h2, h3 {
 .small {
     width: auto;
     margin: 0;
-    padding: 0.35rem 0.9rem;
+    padding: calc(var(--space-xs) - var(--pico-border-width)) var(--space-md);
     font-size: 0.85rem;
-}
-
-.auth-card .button-block {
-    display: block;
-    margin-top: 1.5rem;
+    line-height: 1.5rem;
 }
 
 .danger-button {
@@ -214,16 +234,21 @@ h1, h2, h3 {
 .page-footer-action {
     display: block !important;
     width: 100%;
-    max-width: var(--narrow-width);
-    margin: 1.5rem auto 0 !important;
+    max-width: var(--content-width);
+    margin: var(--card-gap) auto 0 !important;
+}
+
+.auth-card .button-block {
+    display: block;
+    margin-top: var(--space-lg);
 }
 
 /* Forms */
 
 .form-actions {
     display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
+    gap: var(--space-md);
+    margin-top: var(--space-md);
 }
 
 .form-actions button,
@@ -236,19 +261,19 @@ h1, h2, h3 {
 .time-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
+    gap: var(--space-md);
 }
 
 .stack-gap {
-    margin-top: 1rem;
+    margin-top: var(--space-md);
 }
 
 .stack-gap-sm {
-    margin-top: 0.75rem;
+    margin-top: var(--space-sm);
 }
 
 .code-input {
-    margin-top: 1rem;
+    margin-top: var(--space-md);
     text-transform: uppercase;
 }
 
@@ -256,15 +281,15 @@ h1, h2, h3 {
 
 .flashes {
     list-style: none;
-    max-width: var(--narrow-width);
-    margin: 1.5rem auto 0;
+    max-width: var(--content-width);
+    margin: var(--card-gap) auto 0;
     padding: 0;
 }
 
 .flashes li {
     list-style: none;
-    margin-bottom: 0.75rem;
-    padding: 0.75rem 1rem;
+    margin-bottom: var(--space-sm);
+    padding: var(--space-md);
     background: rgba(255, 122, 143, 0.12);
     border: 1px solid rgba(255, 122, 143, 0.35);
     border-radius: var(--pico-border-radius);
@@ -274,12 +299,12 @@ h1, h2, h3 {
 /* Empty state */
 
 .empty {
-    padding: 2.5rem 1rem;
+    padding: var(--space-xl) var(--space-md);
     text-align: center;
     color: var(--pico-muted-color);
 }
 
-/* Invite code (home banner and settings) */
+/* Invite code (Settings) */
 
 .invite-code {
     padding: 0;
@@ -314,51 +339,8 @@ h1, h2, h3 {
 /* 5. Pages
    ========================================================================== */
 
-/* Clock (home) */
+/* Clock (home): fill the screen exactly and center the clock in the space left over */
 
-/* Invite code reminder, shown at the bottom until your partner joins */
-.invite-hint {
-    padding-bottom: 1rem;
-    text-align: center;
-}
-
-.invite-hint p {
-    margin: 0 0 0.5rem;
-    font-size: 0.85rem;
-    color: var(--pico-muted-color);
-}
-
-.invite-hint .invite-copy {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    width: auto;
-    margin: 0;
-    padding: 0.5rem 1.1rem;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    color: var(--pico-primary);
-    background: transparent;
-    border: 1px dashed rgba(255, 122, 143, 0.45);
-    border-radius: 999px;
-}
-
-.invite-hint .invite-copy:hover {
-    border-style: solid;
-}
-
-.invite-copy small {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--pico-muted-color);
-}
-
-/* Fill the screen exactly, so the page doesn't scroll, and let the clock center itself in the space left over */
 .page:has(.clock-stage) {
     display: flex;
     flex-direction: column;
@@ -368,19 +350,19 @@ h1, h2, h3 {
 
 .page:has(.clock-stage) main {
     display: flex;
-    flex-direction: column;
     flex: 1;
+    flex-direction: column;
 }
 
 .clock-stage {
     margin: auto 0;
-    padding: 1.5rem 0;
-    text-align: center;
+    padding: var(--space-lg) 0;
     overflow-x: clip;
+    text-align: center;
 }
 
 .clock-label {
-    margin: 0 0 1.25rem;
+    margin: 0 0 var(--space-lg);
     font-size: 0.9rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -388,16 +370,17 @@ h1, h2, h3 {
 }
 
 .clock-sub {
-    margin: 1.25rem 0 0;
+    margin: var(--space-lg) 0 0;
     font-size: 0.9rem;
     color: var(--pico-muted-color);
 }
 
 /* The form is the ring and the button sits inside it */
+
 .clock-ring {
-    --ring-width: 6px;
+    --ring-width: var(--space-sm);
     position: relative;
-    width: min(76vw, 300px);
+    width: min(80vw, var(--ring-size));
     aspect-ratio: 1 / 1;
     margin: 0 auto;
 }
@@ -456,12 +439,12 @@ h1, h2, h3 {
 
 .clock-ring .clock-button {
     position: absolute;
-    inset: calc(var(--ring-width) + 8px);
+    inset: var(--space-md);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.35rem;
+    gap: var(--space-xs);
     width: auto;
     margin: 0;
     padding: 0;
@@ -484,7 +467,7 @@ h1, h2, h3 {
 
 .clock-ring .clock-button:focus-visible {
     outline: 3px solid var(--pico-primary-focus);
-    outline-offset: 4px;
+    outline-offset: var(--space-xs);
 }
 
 .clock-ring.running .clock-button {
@@ -516,15 +499,14 @@ h1, h2, h3 {
 /* Archive */
 
 .date-card {
-    margin: 0 0 1rem;
-    padding: 1.25rem 1.5rem;
+    margin: 0 0 var(--card-gap);
 }
 
 .date-card-top {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
-    gap: 1rem;
+    gap: var(--space-md);
 }
 
 .date-card h3 {
@@ -533,30 +515,30 @@ h1, h2, h3 {
 }
 
 .pill {
-    padding: 0.15rem 0.65rem;
+    padding: var(--space-xs) var(--space-sm);
     font-size: 0.8rem;
     font-weight: 600;
     white-space: nowrap;
     color: var(--pico-primary);
     background: rgba(255, 122, 143, 0.15);
-    border-radius: 999px;
+    border-radius: var(--radius-full);
 }
 
 .meta {
-    margin: 0.25rem 0 0;
+    margin: var(--space-xs) 0 0;
     font-size: 0.9rem;
     color: var(--pico-muted-color);
 }
 
 .notes {
-    margin: 0.9rem 0 0;
+    margin: var(--space-md) 0 0;
     white-space: pre-line;
 }
 
 .actions {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
 }
 
 .actions form {
@@ -569,11 +551,11 @@ h1, h2, h3 {
 .photo-strip {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.25rem;
+    gap: var(--space-xs);
 }
 
 .photo-strip {
-    margin: 0.9rem 0;
+    margin: var(--space-md) 0;
 }
 
 .gallery-grid a {
@@ -586,7 +568,7 @@ h1, h2, h3 {
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: 0.4rem;
+    border-radius: var(--radius-sm);
 }
 
 img[data-group] {
@@ -595,7 +577,7 @@ img[data-group] {
 
 .photo-edit span {
     display: block;
-    margin-top: 0.25rem;
+    margin-top: var(--space-xs);
     font-size: 0.8rem;
 }
 
@@ -630,8 +612,8 @@ img[data-group] {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: var(--space-2xl);
+    height: var(--space-2xl);
     margin: 0;
     padding: 0;
     border: none;
@@ -643,8 +625,8 @@ img[data-group] {
 }
 
 .viewer-close {
-    top: 1rem;
-    right: 1rem;
+    top: var(--space-md);
+    right: var(--space-md);
 }
 
 .viewer-prev,
@@ -654,16 +636,16 @@ img[data-group] {
 }
 
 .viewer-prev {
-    left: 0.75rem;
+    left: var(--space-md);
 }
 
 .viewer-next {
-    right: 0.75rem;
+    right: var(--space-md);
 }
 
 .viewer-count {
     position: absolute;
-    bottom: calc(1rem + env(safe-area-inset-bottom));
+    bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
     left: 0;
     right: 0;
     text-align: center;
