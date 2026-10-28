@@ -406,12 +406,7 @@ h1, h2, h3 {
     box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
     pointer-events: none;
     opacity: 0.8;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-    .invite-pending::after {
-        animation: idle-breathe 4s ease-in-out infinite;
-    }
+    animation: idle-breathe 4s ease-in-out infinite;
 }
 
 
@@ -496,28 +491,20 @@ h1, h2, h3 {
     to { transform: rotate(360deg); }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .clock-ring.running::before {
-        animation: none;
-    }
+/* Idle: the ring slowly breathes while no date is running */
+.clock-ring::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
+    pointer-events: none;
+    opacity: 0;
 }
 
-/* Idle: the ring slowly breathes while no date is running */
-@media (prefers-reduced-motion: no-preference) {
-    .clock-ring::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border-radius: 50%;
-        box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
-        pointer-events: none;
-        opacity: 0;
-    }
-
-    .clock-ring:not(.running)::before,
-    .clock-ring:not(.running)::after {
-        animation: idle-breathe 4s ease-in-out infinite;
-    }
+.clock-ring:not(.running)::before,
+.clock-ring:not(.running)::after {
+    animation: idle-breathe 4s ease-in-out infinite;
 }
 
 @keyframes idle-breathe {
