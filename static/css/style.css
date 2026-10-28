@@ -334,6 +334,31 @@ h1, h2, h3 {
     color: var(--pico-muted-color);
 }
 
+/* Error pages */
+
+.error-card {
+    text-align: center;
+}
+
+.error-card .error-code {
+    margin: 0 0 var(--space-sm);
+    font-size: 4rem;
+    font-weight: 600;
+    line-height: 1;
+    font-variant-numeric: lining-nums;
+    color: var(--pico-primary);
+}
+
+.error-card .error-message {
+    margin: 0 0 var(--space-lg);
+    color: var(--pico-muted-color);
+}
+
+.error-card [role="button"] {
+    display: block;
+    margin: 0;
+}
+
 /* Invite code (Settings) */
 
 .invite-code {
@@ -371,17 +396,26 @@ h1, h2, h3 {
 
 /* Clock (home): fill the screen exactly and center the clock in the space left over */
 
-.page:has(.clock-stage) {
+/* Fill the screen exactly, so the page doesn't scroll, and center the clock or card in the space left over */
+.page:has(.clock-stage),
+.page:has(.center-card) {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
     min-height: 100dvh;
 }
 
-.page:has(.clock-stage) main {
+.page:has(.clock-stage) main,
+.page:has(.center-card) main {
     display: flex;
     flex: 1;
     flex-direction: column;
+}
+
+.page:has(.center-card) .center-card {
+    width: 100%;
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .clock-stage {

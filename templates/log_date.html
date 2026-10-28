@@ -4,7 +4,7 @@
 {% block content %}
     {% set mins = minutes|int %}
 
-    <article class="auth-card">
+    <article class="auth-card center-card">
         <h1>How was it?</h1>
         <p class="muted">
             You clocked {% if mins >= 60 %}{{ mins // 60 }}h {{ mins % 60 }}m{% else %}{{ mins }}m{% endif %} together.
