@@ -29,6 +29,7 @@
     --radius-sm: 0.5rem;    /*  8px */
     --radius-md: 1rem;      /* 16px */
     --radius-full: 999px;
+    --radius-button: 1.5rem; /* 24px, a full pill on a 48px button */
 
     /* Sizes */
     --content-width: 448px; /* the one column everything lines up to */
@@ -211,6 +212,15 @@ h1, h2, h3 {
 }
 
 /* Buttons */
+
+/* Every button, button-style link and the file picker share one corner radius */
+button,
+[type="submit"],
+[type="button"],
+[role="button"],
+input[type="file"]::file-selector-button {
+    border-radius: var(--radius-button);
+}
 
 .small {
     width: auto;
@@ -573,6 +583,38 @@ h1, h2, h3 {
 }
 
 /* Archive */
+
+/* Archive summary */
+
+.stats-card {
+    margin: 0 0 var(--card-gap);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-md);
+    text-align: center;
+}
+
+.stat-value {
+    display: block;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.75rem;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    color: var(--pico-color);
+}
+
+.stat-label {
+    display: block;
+    margin-top: var(--space-xs);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pico-muted-color);
+}
 
 .date-card {
     margin: 0 0 var(--card-gap);

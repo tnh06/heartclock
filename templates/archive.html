@@ -8,15 +8,27 @@
     </div>
 
     {% if entries %}
+        {# Totals #}
+        <article class="stats-card">
+            <div class="stats-grid">
+                <div>
+                    <span class="stat-value">{{ stats.count }}</span>
+                    <span class="stat-label">{{ 'Date' if stats.count == 1 else 'Dates' }}</span>
+                </div>
+                <div>
+                    <span class="stat-value">{% if stats.total_minutes %}{{ stats.total_minutes|duration }}{% else %}--{% endif %}</span>
+                    <span class="stat-label">Together</span>
+                </div>
+            </div>
+        </article>
+
+        {# All dates #}
         {% for entry in entries %}
             <article class="date-card">
                 <div class="date-card-top">
                     <h3>{{ entry.title }}</h3>
                     {% if entry.duration_minutes %}
-                        {% set mins = entry.duration_minutes %}
-                        <span class="pill">
-                            {% if mins >= 60 %}{{ mins // 60 }}h {{ mins % 60 }}m{% else %}{{ mins }}m{% endif %}
-                        </span>
+                        <span class="pill">{{ entry.duration_minutes|duration }}</span>
                     {% endif %}
                 </div>
 

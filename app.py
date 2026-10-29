@@ -207,6 +207,25 @@ def get_own_entry(entry_id):
     return entry
 
 
+# Archive summary
+
+@app.template_filter('duration')
+def format_duration(minutes):
+    """Turn a number of minutes into text like 3h 30m."""
+    minutes = int(minutes or 0)
+    if minutes >= 60:
+        return f"{minutes // 60}h {minutes % 60}m"
+    return f"{minutes}m"
+
+
+def archive_stats(entries):
+    """Totals shown at the top of the Archive."""
+    return {
+        'count': len(entries),
+        'total_minutes': sum(e.duration_minutes or 0 for e in entries),
+    }
+
+
 @app.context_processor
 def template_values():
     """Values every template can use: the photo limit, and whether to show the dot on the Settings tab."""
@@ -405,8 +424,7 @@ def archive():
                .filter_by(couple_id=current_user.couple_id)
                .order_by(DateEntry.date.desc())
                .all())
-    return render_template('archive.html', entries=entries)
-
+    return render_template('archive.html', entries=entries, stats=archive_stats(entries))
 
 @app.route('/add', methods=['GET', 'POST'])
 @login_required
