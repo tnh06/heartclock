@@ -398,7 +398,7 @@ h1, h2, h3 {
     position: relative;
 }
 
-.invite-pending::after {
+.auth-card.invite-pending::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -406,7 +406,7 @@ h1, h2, h3 {
     box-shadow: 0 0 36px 4px rgba(255, 122, 143, 0.35);
     pointer-events: none;
     opacity: 0.8;
-    animation: idle-breathe 4s ease-in-out infinite;
+    animation: idle-breathe 4s ease-in-out infinite !important;
 }
 
 
@@ -415,7 +415,6 @@ h1, h2, h3 {
 
 /* Clock (home): fill the screen exactly and center the clock in the space left over */
 
-/* Fill the screen exactly, so the page doesn't scroll, and center the clock or card in the space left over */
 .page:has(.clock-stage),
 .page:has(.center-card) {
     display: flex;
@@ -478,20 +477,7 @@ h1, h2, h3 {
     mask: radial-gradient(farthest-side, transparent calc(100% - var(--ring-width)), #000 calc(100% - var(--ring-width) + 1px));
 }
 
-.clock-ring.running {
-    filter: drop-shadow(0 0 18px rgba(255, 77, 106, 0.35));
-}
-
-.clock-ring.running::before {
-    background: conic-gradient(rgba(255, 77, 106, 0), #ff4d6a);
-    animation: ring-spin 4s linear infinite;
-}
-
-@keyframes ring-spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Idle: the ring slowly breathes while no date is running */
+/* Soft glow around the ring, only visible while idle */
 .clock-ring::after {
     content: '';
     position: absolute;
@@ -502,9 +488,24 @@ h1, h2, h3 {
     opacity: 0;
 }
 
+/* The !important matters: Pico switches off all animations when the device asks for reduced motion */
 .clock-ring:not(.running)::before,
 .clock-ring:not(.running)::after {
-    animation: idle-breathe 4s ease-in-out infinite;
+    animation: idle-breathe 4s ease-in-out infinite !important;
+}
+
+/* Running: a bright sweep spins around the ring */
+.clock-ring.running {
+    filter: drop-shadow(0 0 18px rgba(255, 77, 106, 0.35));
+}
+
+.clock-ring.running::before {
+    background: conic-gradient(rgba(255, 77, 106, 0), #ff4d6a);
+    animation: ring-spin 4s linear infinite !important;
+}
+
+@keyframes ring-spin {
+    to { transform: rotate(360deg); }
 }
 
 @keyframes idle-breathe {
