@@ -18,9 +18,9 @@
             </button>
         </form>
 
-        {% if active_session %}
-            <p class="clock-sub">Started <span class="local-time" data-utc="{{ active_session.started_at.isoformat() }}Z"></span></p>
-        {% endif %}
+        <p class="clock-sub">
+            {% if active_session %}Started <span class="local-time" data-utc="{{ active_session.started_at.isoformat() }}Z"></span>{% else %}&nbsp;{% endif %}
+        </p>
     </section>
 
     <script>
