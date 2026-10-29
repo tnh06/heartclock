@@ -446,10 +446,15 @@ input[type="file"]::file-selector-button {
     margin-bottom: auto;
 }
 
+/* Clip at the edge of the screen, not at the edge of the clock, so the glow isn't cut off.
+   This also stops the spinning ring from making the page scroll sideways. */
+.page:has(.clock-stage) {
+    overflow-x: clip;
+}
+
 .clock-stage {
     margin: auto 0;
     padding: var(--space-lg) 0;
-    overflow-x: clip;
     text-align: center;
 }
 
